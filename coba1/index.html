@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Belajar - EXE Education Centre</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX for Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            pink: '#d81b60',
+                            orange: '#f57c00',
+                            yellow: '#fbc02d',
+                            dark: '#1f2022'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .bg-gradient-brand { background: linear-gradient(135deg, #d81b60 0%, #f57c00 50%, #fbc02d 100%); }
+        .text-gradient-brand {
+            background: linear-gradient(135deg, #d81b60 0%, #f57c00 50%, #fbc02d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .view-section { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .katex { font-size: 1.1em; }
+        .soal-card img { max-width: 100%; height: auto; border-radius: 0.75rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #d81b60; border-radius: 10px; }
+        .is-correct { border: 2px solid #10b981 !important; background-color: #f0fdf4 !important; }
+        .is-wrong { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
+    </style>
+</head>
+<body class="font-sans text-gray-800 antialiased bg-slate-50 min-h-screen flex flex-col">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex justify-between items-center">
+            <div class="flex items-center cursor-pointer" onclick="navigateTo('dashboard-view')">
+                <img class="h-10 w-auto" src="https://images2.imgbox.com/ad/c5/3XFVIZZN_o.png" alt="Logo EXE">
+            </div>
+            <div id="nav-user-menu" class="hidden flex items-center space-x-4 text-sm font-semibold text-slate-600">
+                <span>Halo, <span id="display-nama" class="text-brand-pink font-bold">Siswa</span>!</span>
+                <button onclick="doLogout()" class="bg-slate-100 px-4 py-2 rounded-full hover:bg-slate-200 transition-all text-xs font-bold uppercase tracking-tight">Keluar</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-24 pb-12 px-4 max-w-5xl mx-auto w-full text-brand-dark">
+        
+        <!-- LOGIN VIEW -->
+        <section id="auth-view" class="view-section active max-w-md mx-auto mt-10">
+            <div class="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 text-center">
+                <h2 class="text-3xl font-bold mb-8">Masuk Platform</h2>
+                <form onsubmit="doLogin(event)" class="space-y-4">
+                    <input type="text" id="input-email" required placeholder="Nama / Username" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-brand-pink transition-all">
+                    <input type="password" required placeholder="Kata Sandi" class="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-2 focus:ring-brand-pink transition-all">
+                    <button type="submit" class="w-full bg-gradient-brand text-white font-bold py-4 rounded-xl hover:shadow-lg transition-all transform hover:-translate-y-0.5">Mulai Belajar</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- DASHBOARD VIEW -->
+        <section id="dashboard-view" class="view-section text-center">
+            <h1 class="text-3xl font-extrabold mb-2">Selamat Belajar!</h1>
+            <p class="text-slate-500 mb-10 text-sm">Pilih mata pelajaran untuk mengerjakan soal simulasi.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <button onclick="selectSubject('Matematika Wajib')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-pink hover:shadow-md transition-all group">
+                    <div class="w-16 h-16 bg-pink-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-pink transition-colors">
+                        <i class="fas fa-calculator text-brand-pink text-2xl group-hover:text-white"></i>
+                    </div>
+                    <span class="font-bold text-xl block">Matematika</span>
+                </button>
+                <button onclick="selectSubject('Bahasa Indonesia')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-orange hover:shadow-md transition-all group">
+                    <div class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-orange transition-colors">
+                        <i class="fas fa-book text-brand-orange text-2xl group-hover:text-white"></i>
+                    </div>
+                    <span class="font-bold text-xl block">B. Indonesia</span>
+                </button>
+                <button onclick="selectSubject('Bahasa Inggris')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-yellow hover:shadow-md transition-all group">
+                    <div class="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-yellow transition-colors">
+                        <i class="fas fa-language text-brand-yellow text-2xl group-hover:text-white"></i>
+                    </div>
+                    <span class="font-bold text-xl block">B. Inggris</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- TO SELECT VIEW -->
+        <section id="to-select-view" class="view-section">
+            <button onclick="navigateTo('dashboard-view')" class="mb-6 font-semibold text-gray-400 hover:text-brand-pink flex items-center transition-colors text-sm">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
+            </button>
+            <h2 class="text-2xl font-bold mb-6">Pilih Sesi Try Out - <span id="selected-subject-label" class="text-brand-pink"></span></h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="to-buttons"></div>
+        </section>
+
+        <!-- EXAM VIEW -->
+        <section id="exam-view" class="view-section">
+            <div class="flex justify-between items-center mb-8 sticky top-24 z-40 bg-slate-50/90 backdrop-blur-sm py-3 border-b">
+                <h2 id="exam-title" class="text-xl font-bold text-brand-dark uppercase tracking-tight">Latihan</h2>
+                <div class="flex items-center gap-3">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase hidden md:block tracking-widest">Sisa Waktu:</div>
+                    <div class="bg-brand-dark text-white px-5 py-2 rounded-xl font-mono font-bold text-lg shadow-sm" id="timer-box">60:00</div>
+                </div>
+            </div>
+
+            <div id="exam-container" class="space-y-8 pb-32">
+                <div class="text-center py-20">
+                    <i class="fas fa-circle-notch fa-spin text-4xl text-brand-pink mb-4"></i>
+                    <p class="text-gray-500 font-medium">Menarik data dari database EXE...</p>
+                </div>
+            </div>
+
+            <div id="exam-footer" class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t p-4 flex justify-center z-50">
+                <button onclick="submitExam()" id="btn-submit" class="hidden px-16 py-4 bg-brand-pink text-white rounded-2xl font-bold hover:bg-brand-dark shadow-2xl hover:-translate-y-1 transition-all">Selesai & Kumpulkan Jawaban</button>
+            </div>
+        </section>
+
+        <!-- RESULT VIEW -->
+        <section id="result-view" class="view-section">
+            <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-100 max-w-4xl mx-auto mb-10 text-center">
+                <h2 class="text-2xl font-bold text-slate-400 mb-2 tracking-widest uppercase">Skor Akhir</h2>
+                <div class="text-8xl font-black text-brand-dark mb-10" id="final-score">0</div>
+
+                <div id="analysis-container" class="mb-10 text-left">
+                    <h3 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fas fa-chart-pie text-brand-orange"></i> Analisis Per Topik</h3>
+                    <div class="overflow-x-auto rounded-2xl border border-slate-100">
+                        <table class="w-full text-sm">
+                            <thead class="bg-slate-50 text-slate-400 text-[10px] font-bold uppercase">
+                                <tr>
+                                    <th class="p-4 text-left">Topik</th>
+                                    <th class="p-4 text-center">Bener</th>
+                                    <th class="p-4 text-center">Total</th>
+                                    <th class="p-4 text-center">Akurasi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analysis-body" class="divide-y divide-slate-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button onclick="toggleReview()" class="bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold hover:bg-slate-200 transition-all">Lihat Pembahasan</button>
+                    <button onclick="navigateTo('dashboard-view')" class="bg-brand-dark text-white py-4 rounded-2xl font-bold hover:bg-black transition-all shadow-lg">Kembali ke Dashboard</button>
+                </div>
+            </div>
+
+            <div id="review-container" class="hidden space-y-8 pb-32 max-w-4xl mx-auto">
+                <div id="review-list" class="space-y-6"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxRc9WNbxdj8lMdJUyZzvW8rBghM0cF01wSMcjrb4NmnHF5CO9F-2oqoXcmXv8nzEYKg/exec"; 
+        
+        let allSoalData = [];
+        let currentSoalFiltered = [];
+        let selectedSubject = "";
+        let selectedTO = 0;
+        let userAnswers = {};
+        
+        let timerInterval;
+        let targetTime;
+
+        function triggerMath(element) {
+            if (window.renderMathInElement) {
+                renderMathInElement(element || document.body, {
+                    delimiters: [
+                        {left: "$$", right: "$$", display: true},
+                        {left: "$", right: "$", display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        function navigateTo(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('exam-footer').style.display = (viewId === 'exam-view') ? 'flex' : 'none';
+        }
+
+        function selectSubject(subject) {
+            selectedSubject = subject;
+            document.getElementById('selected-subject-label').innerText = subject;
+            const btnContainer = document.getElementById('to-buttons');
+            btnContainer.innerHTML = "";
+            for(let i=1; i<=6; i++){
+                const btn = document.createElement('button');
+                btn.onclick = () => startExam(i);
+                btn.className = "p-6 bg-white border border-slate-100 rounded-2xl hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all font-bold text-lg text-slate-700 shadow-sm";
+                btn.innerText = `Try Out ${i}`;
+                btnContainer.appendChild(btn);
+            }
+            navigateTo('to-select-view');
+        }
+
+        async function startExam(toNo) {
+            selectedTO = toNo;
+            userAnswers = {};
+            document.getElementById('review-container').classList.add('hidden');
+            navigateTo('exam-view');
+            document.getElementById('exam-title').innerText = `${selectedSubject} - TO ${selectedTO}`;
+            document.getElementById('btn-submit').classList.add('hidden');
+            const container = document.getElementById('exam-container');
+            container.innerHTML = `<div class="text-center py-20"><i class="fas fa-circle-notch fa-spin text-4xl text-brand-pink mb-4"></i><p class="text-gray-500 font-medium tracking-tight">Menyusun soal...</p></div>`;
+
+            try {
+                if (allSoalData.length === 0) {
+                    const response = await fetch(SCRIPT_URL);
+                    const json = await response.json();
+                    allSoalData = Array.isArray(json) ? json : [];
+                }
+                currentSoalFiltered = allSoalData.filter(s => String(s.Mapel).trim() === selectedSubject && Number(s.TO_Ke) === selectedTO);
+                
+                if (currentSoalFiltered.length === 0) {
+                    container.innerHTML = `<div class='p-12 text-center text-gray-500 bg-white rounded-3xl border border-dashed border-slate-300'><p class='font-bold text-lg'>Soal Belum Tersedia!</p></div>`;
+                    return;
+                }
+                renderSoalList();
+                document.getElementById('btn-submit').classList.remove('hidden');
+                initTimer(60); 
+            } catch (err) {
+                container.innerHTML = `<div class='p-12 text-center text-red-500 bg-red-50 rounded-3xl border border-red-200'><p class='font-bold'>Eror Koneksi Database!</p></div>`;
+            }
+        }
+
+        function initTimer(minutes) {
+            clearInterval(timerInterval);
+            targetTime = Date.now() + minutes * 60 * 1000;
+            timerInterval = setInterval(() => {
+                const diff = targetTime - Date.now();
+                if (diff <= 0) { clearInterval(timerInterval); submitExam(); return; }
+                const m = Math.floor(diff / 1000 / 60);
+                const s = Math.floor((diff / 1000) % 60);
+                document.getElementById('timer-box').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function renderSoalList() {
+            const container = document.getElementById('exam-container');
+            container.innerHTML = "";
+
+            currentSoalFiltered.forEach((soal, index) => {
+                const no = soal.No_Soal || (index + 1);
+                const type = Number(soal.Tipe_Soal);
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 soal-card relative overflow-hidden";
+                
+                let stimulusHtml = soal.Stimulus;
+                if (String(stimulusHtml).includes('http')) { stimulusHtml = `<img src="${stimulusHtml}" alt="Stimulus">`; }
+
+                let middleContent = "";
+                let optionsHtml = "";
+
+                if (type === 3) {
+                    // Tipe 3: Tabel Benar/Salah (Nomor 8)
+                    const stmts = [soal.Opsi_A, soal.Opsi_B, soal.Opsi_C, soal.Opsi_D, soal.Opsi_E].filter(x => x && x !== "-");
+                    middleContent = `
+                        <div class="my-6 overflow-hidden rounded-xl border border-slate-200">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-slate-800 text-white font-bold text-[10px] uppercase">
+                                    <tr><th class="p-3 border-r border-slate-700">Pernyataan Analisis</th><th class="p-3 text-center w-24">Benar</th><th class="p-3 text-center w-24">Salah</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${stmts.map((s, i) => `
+                                        <tr>
+                                            <td class="p-4 border-r bg-slate-50/30">${s}</td>
+                                            <td class="p-4 text-center"><input type="radio" name="q${no}_row${i+1}" value="B" onchange="saveTableAns(${no}, ${i+1}, 'B')" class="w-5 h-5 accent-green-600"></td>
+                                            <td class="p-4 text-center"><input type="radio" name="q${no}_row${i+1}" value="S" onchange="saveTableAns(${no}, ${i+1}, 'S')" class="w-5 h-5 accent-red-600"></td>
+                                        </tr>
+                                    `).join("")}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                } else if (type === 4) {
+                    // Tipe 4: Perbandingan P & Q
+                    middleContent = `
+                        <div class="my-8 overflow-hidden rounded-2xl border-2 border-slate-800 shadow-lg max-w-2xl mx-auto">
+                            <table class="w-full text-center table-fixed">
+                                <thead class="bg-slate-800 text-white font-black uppercase text-xs tracking-widest">
+                                    <tr><th class="p-4 border-r border-slate-700">Kuantitas P</th><th class="p-4">Kuantitas Q</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="divide-x-2 divide-slate-200">
+                                        <td class="p-8 bg-white font-bold text-xl text-brand-pink">${soal.Opsi_A}</td>
+                                        <td class="p-8 bg-white font-bold text-xl text-brand-pink">${soal.Opsi_B}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    const choices = [
+                        { l: 'A', t: "Kuantitas P lebih besar daripada kuantitas Q." },
+                        { l: 'B', t: "Kuantitas P lebih kecil daripada kuantitas Q." },
+                        { l: 'C', t: "Kuantitas P sama dengan kuantitas Q." },
+                        { l: 'D', t: "Informasi yang diberikan tidak cukup untuk memutuskan." }
+                    ];
+                    choices.forEach(c => {
+                        optionsHtml += `<label class="flex items-center p-4 rounded-xl border border-slate-100 hover:border-brand-pink hover:bg-pink-50/30 cursor-pointer transition-all mb-3 group">
+                            <input type="radio" name="q${no}" value="${c.l}" onchange="saveSingleAns(${no}, '${c.l}')" class="w-5 h-5 accent-brand-pink shrink-0">
+                            <span class="ml-4 font-bold text-gray-300 group-hover:text-brand-pink shrink-0">${c.l}.</span>
+                            <span class="ml-2 flex-1 text-gray-700 text-sm">${c.t}</span>
+                        </label>`;
+                    });
+                } else if (type === 5) {
+                    // Tipe 5: AKD
+                    middleContent = `<div class="mt-6 p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 mb-8 shadow-inner">
+                        <div class="flex gap-4"><span class="font-bold text-brand-pink shrink-0">(1)</span> <span class="text-gray-700 leading-relaxed">${soal.Opsi_A}</span></div>
+                        <div class="flex gap-4"><span class="font-bold text-brand-pink shrink-0">(2)</span> <span class="text-gray-700 leading-relaxed">${soal.Opsi_B}</span></div>
+                    </div>`;
+                    const choices = [
+                        { l: 'A', t: "Pernyataan (1) SAJA cukup, tapi (2) SAJA tidak cukup." },
+                        { l: 'B', t: "Pernyataan (2) SAJA cukup, tapi (1) SAJA tidak cukup." },
+                        { l: 'C', t: "DUA pernyataan BERSAMA-SAMA cukup, tapi SATU SAJA tidak cukup." },
+                        { l: 'D', t: "Pernyataan (1) SAJA cukup, dan (2) SAJA juga cukup." },
+                        { l: 'E', t: "Pernyataan (1) dan (2) tidak cukup." }
+                    ];
+                    choices.forEach(c => {
+                        optionsHtml += `<label class="flex items-center p-4 rounded-xl border border-slate-100 hover:border-brand-pink hover:bg-pink-50/30 cursor-pointer transition-all mb-3 group">
+                            <input type="radio" name="q${no}" value="${c.l}" onchange="saveSingleAns(${no}, '${c.l}')" class="w-5 h-5 accent-brand-pink shrink-0">
+                            <span class="ml-4 font-bold text-gray-300 group-hover:text-brand-pink shrink-0">${c.l}.</span>
+                            <span class="ml-2 flex-1 text-gray-700 text-sm">${c.t}</span>
+                        </label>`;
+                    });
+                } else {
+                    ["A","B","C","D","E"].forEach(l => {
+                        const t = soal[`Opsi_${l}`];
+                        if (t && t !== "-") {
+                            const inputType = (type === 2) ? "checkbox" : "radio";
+                            const onChangeFn = (type === 2) ? `saveMultiAns(${no})` : `saveSingleAns(${no}, '${l}')`;
+                            optionsHtml += `<label class="flex items-center p-4 rounded-xl border border-slate-100 hover:border-brand-pink hover:bg-pink-50/30 cursor-pointer transition-all mb-3 group">
+                                <input type="${inputType}" name="q${no}" value="${l}" onchange="${inputType === 'checkbox' ? 'saveMultiAns('+no+')' : 'saveSingleAns('+no+', \''+l+'\')'}" class="w-5 h-5 accent-brand-pink shrink-0">
+                                <span class="ml-4 font-bold text-gray-300 group-hover:text-brand-pink shrink-0">${l}.</span>
+                                <span class="ml-2 flex-1 text-gray-700 text-sm">${t}</span>
+                            </label>`;
+                        }
+                    });
+                }
+
+                card.innerHTML = `
+                    <div class="flex flex-col md:flex-row items-start gap-6">
+                        <div class="bg-brand-pink/10 w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-brand-pink shrink-0 text-lg">${no}</div>
+                        <div class="flex-1 w-full">
+                            <div class="mb-4 text-slate-600 leading-relaxed">${stimulusHtml}</div>
+                            ${middleContent}
+                            <div class="text-xl font-bold mb-8 text-brand-dark leading-snug">${soal.Pertanyaan}</div>
+                            <div class="grid grid-cols-1">${optionsHtml}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            triggerMath(container);
+        }
+
+        function saveSingleAns(no, val) { userAnswers[no] = val; }
+        function saveMultiAns(no) {
+            const checked = document.querySelectorAll(`input[name="q${no}"]:checked`);
+            userAnswers[no] = Array.from(checked).map(c => c.value).sort().join(",");
+        }
+        function saveTableAns(no, rowNo, val) {
+            if (!userAnswers[no]) userAnswers[no] = {};
+            userAnswers[no][rowNo] = val;
+        }
+
+        function submitExam() {
+            clearInterval(timerInterval);
+            let correct = 0;
+            let topicAnalysis = {};
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = "";
+
+            currentSoalFiltered.forEach((s, idx) => {
+                const no = s.No_Soal || (idx + 1);
+                const type = Number(s.Tipe_Soal);
+                let isCorrect = false;
+                let userDisp = "";
+                
+                if (type === 3) {
+                    const ansObj = userAnswers[no] || {};
+                    const benerRows = String(s.Kunci).split(",").map(x => x.trim());
+                    const rowCount = [s.Opsi_A, s.Opsi_B, s.Opsi_C, s.Opsi_D, s.Opsi_E].filter(x => x && x !== "-").length;
+                    let matches = 0;
+                    for(let i=1; i<=rowCount; i++) {
+                        const expected = benerRows.includes(String(i)) ? "B" : "S";
+                        if (ansObj[i] === expected) matches++;
+                    }
+                    isCorrect = (matches === rowCount);
+                    userDisp = "Analisis Baris";
+                } else {
+                    const uVal = (userAnswers[no] || "").trim().toUpperCase();
+                    const kVal = String(s.Kunci || "").trim().toUpperCase();
+                    isCorrect = (uVal === kVal);
+                    userDisp = uVal || "(Kosong)";
+                }
+
+                if (isCorrect) correct++;
+                const topic = s.Topik || "Umum";
+                if (!topicAnalysis[topic]) topicAnalysis[topic] = { correct: 0, total: 0 };
+                topicAnalysis[topic].total++;
+                if (isCorrect) topicAnalysis[topic].correct++;
+
+                const reviewCard = document.createElement('div');
+                reviewCard.className = `bg-white p-6 md:p-8 rounded-3xl shadow-sm border ${isCorrect ? 'is-correct' : 'is-wrong'}`;
+                reviewCard.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center gap-3"><span class="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold">#${no}</span><span class="text-[10px] px-3 py-1 bg-slate-100 rounded-full font-bold text-slate-500 uppercase">${topic}</span></div>
+                        <span class="font-bold text-xs ${isCorrect ? 'text-green-600' : 'text-red-600'} uppercase"><i class="fas ${isCorrect ? 'fa-check-circle' : 'fa-times-circle'} mr-1"></i> ${isCorrect ? 'Benar' : 'Salah'}</span>
+                    </div>
+                    <div class="text-slate-800 font-medium mb-6">${s.Pertanyaan}</div>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-sm leading-relaxed">
+                        <p class="text-xs font-bold text-brand-pink uppercase mb-3"><i class="fas fa-lightbulb mr-1"></i> Pembahasan</p>
+                        ${s.Pembahasan || 'Pembahasan belum tersedia.'}
+                    </div>
+                `;
+                reviewList.appendChild(reviewCard);
+            });
+
+            document.getElementById('final-score').innerText = Math.round((correct / currentSoalFiltered.length) * 100);
+            const analysisBody = document.getElementById('analysis-body');
+            analysisBody.innerHTML = "";
+            for (const t in topicAnalysis) {
+                const acc = Math.round((topicAnalysis[t].correct / topicAnalysis[t].total) * 100);
+                analysisBody.innerHTML += `<tr><td class="p-4 font-bold text-slate-600 uppercase text-[10px]">${t}</td><td class="p-4 text-center text-green-600 font-bold">${topicAnalysis[t].correct}</td><td class="p-4 text-center font-bold text-slate-400">${topicAnalysis[t].total}</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-full font-bold text-white text-[10px] ${acc >= 75 ? 'bg-green-500' : acc >= 50 ? 'bg-brand-orange' : 'bg-red-500'}">${acc}%</span></td></tr>`;
+            }
+            navigateTo('result-view');
+            triggerMath(reviewList);
+        }
+
+        function toggleReview() {
+            const container = document.getElementById('review-container');
+            container.classList.toggle('hidden');
+            if (!container.classList.contains('hidden')) container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function doLogin(e) { e.preventDefault(); const name = document.getElementById('input-email').value.split('@')[0]; document.getElementById('display-nama').innerText = name; document.getElementById('nav-user-menu').classList.remove('hidden'); navigateTo('dashboard-view'); }
+        function doLogout() { document.getElementById('nav-user-menu').classList.add('hidden'); allSoalData = []; navigateTo('auth-view'); }
+        window.onload = () => triggerMath();
+    </script>
+</body>
+</html>
