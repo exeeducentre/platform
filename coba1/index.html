@@ -15,7 +15,7 @@
     
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <!-- KaTeX for Math Rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
@@ -138,7 +138,7 @@
                 </div>
             </div>
 
-            <div id="exam-footer" class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t p-4 flex justify-center z-50">
+            <div id="exam-footer" class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t p-4 flex justify-center z-50" style="display: none;">
                 <button onclick="submitExam()" id="btn-submit" class="hidden px-16 py-4 bg-brand-pink text-white rounded-2xl font-bold hover:bg-brand-dark shadow-2xl hover:-translate-y-1 transition-all">Selesai & Kumpulkan Jawaban</button>
             </div>
         </section>
@@ -179,7 +179,7 @@
     </main>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxRc9WNbxdj8lMdJUyZzvW8rBghM0cF01wSMcjrb4NmnHF5CO9F-2oqoXcmXv8nzEYKg/exec"; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxRc9WNbxdj8lMdJUyZzvW8rBghM0cF01wSMcjrb4NmnHF5CO9F-2oqoXcmXv8nzEYKg/exec";
         
         let allSoalData = [];
         let currentSoalFiltered = [];
@@ -231,6 +231,7 @@
             navigateTo('exam-view');
             document.getElementById('exam-title').innerText = `${selectedSubject} - TO ${selectedTO}`;
             document.getElementById('btn-submit').classList.add('hidden');
+            
             const container = document.getElementById('exam-container');
             container.innerHTML = `<div class="text-center py-20"><i class="fas fa-circle-notch fa-spin text-4xl text-brand-pink mb-4"></i><p class="text-gray-500 font-medium tracking-tight">Menyusun soal...</p></div>`;
 
@@ -240,15 +241,18 @@
                     const json = await response.json();
                     allSoalData = Array.isArray(json) ? json : [];
                 }
+                
                 currentSoalFiltered = allSoalData.filter(s => String(s.Mapel).trim() === selectedSubject && Number(s.TO_Ke) === selectedTO);
                 
                 if (currentSoalFiltered.length === 0) {
                     container.innerHTML = `<div class='p-12 text-center text-gray-500 bg-white rounded-3xl border border-dashed border-slate-300'><p class='font-bold text-lg'>Soal Belum Tersedia!</p></div>`;
                     return;
                 }
+                
                 renderSoalList();
                 document.getElementById('btn-submit').classList.remove('hidden');
-                initTimer(60); 
+                initTimer(60);
+                
             } catch (err) {
                 container.innerHTML = `<div class='p-12 text-center text-red-500 bg-red-50 rounded-3xl border border-red-200'><p class='font-bold'>Eror Koneksi Database!</p></div>`;
             }
@@ -277,19 +281,25 @@
                 card.className = "bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 soal-card relative overflow-hidden";
                 
                 let stimulusHtml = soal.Stimulus;
-                if (String(stimulusHtml).includes('http')) { stimulusHtml = `<img src="${stimulusHtml}" alt="Stimulus">`; }
+                if (String(stimulusHtml).includes('http')) { 
+                    stimulusHtml = `<img src="${stimulusHtml}" alt="Stimulus">`; 
+                }
 
                 let middleContent = "";
                 let optionsHtml = "";
 
                 if (type === 3) {
-                    // Tipe 3: Tabel Benar/Salah (Nomor 8)
+                    // Tipe 3: Tabel Benar/Salah
                     const stmts = [soal.Opsi_A, soal.Opsi_B, soal.Opsi_C, soal.Opsi_D, soal.Opsi_E].filter(x => x && x !== "-");
                     middleContent = `
                         <div class="my-6 overflow-hidden rounded-xl border border-slate-200">
                             <table class="w-full text-sm text-left">
                                 <thead class="bg-slate-800 text-white font-bold text-[10px] uppercase">
-                                    <tr><th class="p-3 border-r border-slate-700">Pernyataan Analisis</th><th class="p-3 text-center w-24">Benar</th><th class="p-3 text-center w-24">Salah</th></tr>
+                                    <tr>
+                                        <th class="p-3 border-r border-slate-700">Pernyataan Analisis</th>
+                                        <th class="p-3 text-center w-24">Benar</th>
+                                        <th class="p-3 text-center w-24">Salah</th>
+                                    </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100">
                                     ${stmts.map((s, i) => `
@@ -327,7 +337,8 @@
                         { l: 'D', t: "Informasi yang diberikan tidak cukup untuk memutuskan." }
                     ];
                     choices.forEach(c => {
-                        optionsHtml += `<label class="flex items-center p-4 rounded-xl border border-slate-100 hover:border-brand-pink hover:bg-pink-50/30 cursor-pointer transition-all mb-3 group">
+                        optionsHtml += `
+                        <label class="flex items-center p-4 rounded-xl border border-slate-100 hover:border-brand-pink hover:bg-pink-50/30 cursor-pointer transition-all mb-3 group">
                             <input type="radio" name="q${no}" value="${c.l}" onchange="saveSingleAns(${no}, '${c.l}')" class="w-5 h-5 accent-brand-pink shrink-0">
                             <span class="ml-4 font-bold text-gray-300 group-hover:text-brand-pink shrink-0">${c.l}.</span>
                             <span class="ml-2 flex-1 text-gray-700 text-sm">${c.t}</span>
@@ -335,32 +346,39 @@
                     });
                 } else if (type === 5) {
                     // Tipe 5: AKD
-                    middleContent = `<div class="mt-6 p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 mb-8 shadow-inner">
+                    middleContent = `
+                    <div class="mt-6 p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-3 mb-8 shadow-inner">
                         <div class="flex gap-4"><span class="font-bold text-brand-pink shrink-0">(1)</span> <span class="text-gray-700 leading-relaxed">${soal.Opsi_A}</span></div>
                         <div class="flex gap-4"><span class="font-bold text-brand-pink shrink-0">(2)</span> <span class="text-gray-700 leading-relaxed">${soal.Opsi_B}</span></div>
                     </div>`;
+                    
+                    // -- OPSI JAWABAN YANG BARU DIPERBARUI --
                     const choices = [
-                        { l: 'A', t: "Pernyataan (1) SAJA cukup, tapi (2) SAJA tidak cukup." },
-                        { l: 'B', t: "Pernyataan (2) SAJA cukup, tapi (1) SAJA tidak cukup." },
-                        { l: 'C', t: "DUA pernyataan BERSAMA-SAMA cukup, tapi SATU SAJA tidak cukup." },
-                        { l: 'D', t: "Pernyataan (1) SAJA cukup, dan (2) SAJA juga cukup." },
-                        { l: 'E', t: "Pernyataan (1) dan (2) tidak cukup." }
+                        { l: 'A', t: "Pernyataan (1) SAJA cukup untuk menjawab pertanyaan, tetapi pernyataan (2) SAJA tidak cukup." },
+                        { l: 'B', t: "Pernyataan (2) SAJA cukup untuk menjawab pertanyaan, tetapi pernyataan (1) SAJA tidak cukup." },
+                        { l: 'C', t: "DUA pernyataan BERSAMA-SAMA cukup untuk menjawab pertanyaan, tetapi SATU pernyataan SAJA tidak cukup." },
+                        { l: 'D', t: "Pernyataan (1) SAJA cukup untuk menjawab pertanyaan, dan pernyataan (2) SAJA juga cukup." },
+                        { l: 'E', t: "Pernyataan (1) dan pernyataan (2) tidak cukup untuk menjawab pertanyaan." }
                     ];
+                    
                     choices.forEach(c => {
-                        optionsHtml += `<label class="flex items-center p-4 rounded-xl border border-slate-100 hover:border-brand-pink hover:bg-pink-50/30 cursor-pointer transition-all mb-3 group">
+                        optionsHtml += `
+                        <label class="flex items-center p-4 rounded-xl border border-slate-100 hover:border-brand-pink hover:bg-pink-50/30 cursor-pointer transition-all mb-3 group">
                             <input type="radio" name="q${no}" value="${c.l}" onchange="saveSingleAns(${no}, '${c.l}')" class="w-5 h-5 accent-brand-pink shrink-0">
                             <span class="ml-4 font-bold text-gray-300 group-hover:text-brand-pink shrink-0">${c.l}.</span>
                             <span class="ml-2 flex-1 text-gray-700 text-sm">${c.t}</span>
                         </label>`;
                     });
                 } else {
+                    // Tipe 1 (Pilihan Ganda Biasa) & Tipe 2 (Pilihan Ganda Kompleks / Checkbox)
                     ["A","B","C","D","E"].forEach(l => {
                         const t = soal[`Opsi_${l}`];
                         if (t && t !== "-") {
                             const inputType = (type === 2) ? "checkbox" : "radio";
                             const onChangeFn = (type === 2) ? `saveMultiAns(${no})` : `saveSingleAns(${no}, '${l}')`;
-                            optionsHtml += `<label class="flex items-center p-4 rounded-xl border border-slate-100 hover:border-brand-pink hover:bg-pink-50/30 cursor-pointer transition-all mb-3 group">
-                                <input type="${inputType}" name="q${no}" value="${l}" onchange="${inputType === 'checkbox' ? 'saveMultiAns('+no+')' : 'saveSingleAns('+no+', \''+l+'\')'}" class="w-5 h-5 accent-brand-pink shrink-0">
+                            optionsHtml += `
+                            <label class="flex items-center p-4 rounded-xl border border-slate-100 hover:border-brand-pink hover:bg-pink-50/30 cursor-pointer transition-all mb-3 group">
+                                <input type="${inputType}" name="q${no}" value="${l}" onchange="${onChangeFn}" class="w-5 h-5 accent-brand-pink shrink-0">
                                 <span class="ml-4 font-bold text-gray-300 group-hover:text-brand-pink shrink-0">${l}.</span>
                                 <span class="ml-2 flex-1 text-gray-700 text-sm">${t}</span>
                             </label>`;
@@ -435,8 +453,13 @@
                 reviewCard.className = `bg-white p-6 md:p-8 rounded-3xl shadow-sm border ${isCorrect ? 'is-correct' : 'is-wrong'}`;
                 reviewCard.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
-                        <div class="flex items-center gap-3"><span class="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold">#${no}</span><span class="text-[10px] px-3 py-1 bg-slate-100 rounded-full font-bold text-slate-500 uppercase">${topic}</span></div>
-                        <span class="font-bold text-xs ${isCorrect ? 'text-green-600' : 'text-red-600'} uppercase"><i class="fas ${isCorrect ? 'fa-check-circle' : 'fa-times-circle'} mr-1"></i> ${isCorrect ? 'Benar' : 'Salah'}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold">#${no}</span>
+                            <span class="text-[10px] px-3 py-1 bg-slate-100 rounded-full font-bold text-slate-500 uppercase">${topic}</span>
+                        </div>
+                        <span class="font-bold text-xs ${isCorrect ? 'text-green-600' : 'text-red-600'} uppercase">
+                            <i class="fas ${isCorrect ? 'fa-check-circle' : 'fa-times-circle'} mr-1"></i> ${isCorrect ? 'Benar' : 'Salah'}
+                        </span>
                     </div>
                     <div class="text-slate-800 font-medium mb-6">${s.Pertanyaan}</div>
                     <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-sm leading-relaxed">
@@ -448,12 +471,22 @@
             });
 
             document.getElementById('final-score').innerText = Math.round((correct / currentSoalFiltered.length) * 100);
+            
             const analysisBody = document.getElementById('analysis-body');
             analysisBody.innerHTML = "";
             for (const t in topicAnalysis) {
                 const acc = Math.round((topicAnalysis[t].correct / topicAnalysis[t].total) * 100);
-                analysisBody.innerHTML += `<tr><td class="p-4 font-bold text-slate-600 uppercase text-[10px]">${t}</td><td class="p-4 text-center text-green-600 font-bold">${topicAnalysis[t].correct}</td><td class="p-4 text-center font-bold text-slate-400">${topicAnalysis[t].total}</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-full font-bold text-white text-[10px] ${acc >= 75 ? 'bg-green-500' : acc >= 50 ? 'bg-brand-orange' : 'bg-red-500'}">${acc}%</span></td></tr>`;
+                analysisBody.innerHTML += `
+                    <tr>
+                        <td class="p-4 font-bold text-slate-600 uppercase text-[10px]">${t}</td>
+                        <td class="p-4 text-center text-green-600 font-bold">${topicAnalysis[t].correct}</td>
+                        <td class="p-4 text-center font-bold text-slate-400">${topicAnalysis[t].total}</td>
+                        <td class="p-4 text-center">
+                            <span class="px-3 py-1 rounded-full font-bold text-white text-[10px] ${acc >= 75 ? 'bg-green-500' : acc >= 50 ? 'bg-brand-orange' : 'bg-red-500'}">${acc}%</span>
+                        </td>
+                    </tr>`;
             }
+            
             navigateTo('result-view');
             triggerMath(reviewList);
         }
@@ -464,8 +497,20 @@
             if (!container.classList.contains('hidden')) container.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function doLogin(e) { e.preventDefault(); const name = document.getElementById('input-email').value.split('@')[0]; document.getElementById('display-nama').innerText = name; document.getElementById('nav-user-menu').classList.remove('hidden'); navigateTo('dashboard-view'); }
-        function doLogout() { document.getElementById('nav-user-menu').classList.add('hidden'); allSoalData = []; navigateTo('auth-view'); }
+        function doLogin(e) { 
+            e.preventDefault(); 
+            const name = document.getElementById('input-email').value.split('@')[0]; 
+            document.getElementById('display-nama').innerText = name; 
+            document.getElementById('nav-user-menu').classList.remove('hidden'); 
+            navigateTo('dashboard-view'); 
+        }
+        
+        function doLogout() { 
+            document.getElementById('nav-user-menu').classList.add('hidden'); 
+            allSoalData = []; 
+            navigateTo('auth-view'); 
+        }
+        
         window.onload = () => triggerMath();
     </script>
 </body>
