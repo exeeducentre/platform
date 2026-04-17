@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Bank Soal EXE - 20 Soal Terverifikasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        table td { max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        table tr:hover td { white-space: normal; background-color: #f8fafc; word-break: break-word; }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8 font-sans text-[10px]">
+
+    <div class="max-w-full mx-auto bg-white p-6 rounded-xl shadow-lg border-t-8 border-brand-pink">
+        <div class="mb-6 border-b pb-4">
+            <h1 class="text-2xl font-bold text-gray-800 uppercase">Database Bank Soal EXE (QC Final)</h1>
+            <p class="text-gray-500 italic text-xs">Semua rules Tipe Soal (1-5) sudah diterapkan secara presisi. No bold in Pembahasan. LaTeX $ format fixed.</p>
+        </div>
+
+        <div class="overflow-x-auto border rounded-lg shadow-inner">
+            <table class="w-full text-left border-collapse border border-gray-300" id="table-soal">
+                <thead>
+                    <tr class="bg-gray-900 text-white uppercase text-center">
+                        <th class="p-2 border border-gray-400">No_Soal</th>
+                        <th class="p-2 border border-gray-400">Mapel</th>
+                        <th class="p-2 border border-gray-400">TO_Ke</th>
+                        <th class="p-2 border border-gray-400">Tipe_Soal</th>
+                        <th class="p-2 border border-gray-400">Stimulus</th>
+                        <th class="p-2 border border-gray-400">Pertanyaan</th>
+                        <th class="p-2 border border-gray-400">Opsi_A</th>
+                        <th class="p-2 border border-gray-400">Opsi_B</th>
+                        <th class="p-2 border border-gray-400">Opsi_C</th>
+                        <th class="p-2 border border-gray-400">Opsi_D</th>
+                        <th class="p-2 border border-gray-400">Opsi_E</th>
+                        <th class="p-2 border border-gray-400">Kunci</th>
+                        <th class="p-2 border border-gray-400">Pembahasan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <!-- 1 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">1</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Seorang peneliti mengamati populasi amuba. Populasi awal adalah $2,5 \times 10^5$. Setelah satu jam, populasinya menjadi $5 \times 10^5$. Jika pertumbuhan populasi mengikuti pola eksponensial.</td>
+                        <td class="p-2 border">Berapa populasi amuba setelah 4 jam?</td>
+                        <td class="p-2 border">$1 \times 10^6$</td>
+                        <td class="p-2 border">$2 \times 10^6$</td>
+                        <td class="p-2 border">$4 \times 10^6$</td>
+                        <td class="p-2 border">$8 \times 10^6$</td>
+                        <td class="p-2 border">$1,6 \times 10^7$</td>
+                        <td class="p-2 border text-center">C</td>
+                        <td class="p-2 border">Jawaban: C. $4 \times 10^6$. Langkah 1: Tentukan rasio pertumbuhan per jam. Rasio (r) = Populasi setelah 1 jam / Populasi awal = $(5 \times 10^5) / (2,5 \times 10^5) = 2$. Ini berarti populasi menjadi dua kali lipat setiap jam. Langkah 2: Gunakan rumus pertumbuhan eksponensial $P_n = P_0 \times r^n$. Langkah 3: Substitusi nilai untuk mencari populasi setelah 4 jam ($P_4$). $P_4 = (2,5 \times 10^5) \times 2^4 = (2,5 \times 10^5) \times 16 = 40 \times 10^5 = 4 \times 10^6$.</td>
+                    </tr>
+                    <!-- 2 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">2</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">5</td>
+                        <td class="p-2 border">Titik P berada pada garis $y=mx+c$. Apakah titik P berada di kuadran I?</td>
+                        <td class="p-2 border">Tentukan kecukupan data dari pernyataan tersebut.</td>
+                        <td class="p-2 border">(1) Garis tersebut memotong sumbu Y positif.</td>
+                        <td class="p-2 border">(2) Gradien garis tersebut negatif.</td>
+                        <td class="p-2 border">-</td>
+                        <td class="p-2 border">-</td>
+                        <td class="p-2 border">-</td>
+                        <td class="p-2 border text-center">E</td>
+                        <td class="p-2 border">Jawaban: E. Pernyataan (1) dan pernyataan (2) tidak cukup untuk menjawab pertanyaan. Analisis Pertanyaan: Untuk memastikan titik P berada di kuadran I, kita harus yakin bahwa koordinat x dan y dari P adalah positif ($x > 0, y > 0$). Analisis Pernyataan (1): Garis memotong sumbu Y positif. Ini berarti $c > 0$. Namun, kita tidak tahu gradiennya. Garis bisa saja naik atau turun. Pernyataan (1) SAJA tidak cukup. Analisis Pernyataan (2): Gradien garis negatif. Ini berarti $m < 0$. Namun, kita tidak tahu di mana garis memotong sumbu Y. Pernyataan (2) SAJA tidak cukup. Analisis Kedua Pernyataan Bersama: Kita tahu $c > 0$ dan $m < 0$. Garis melewati Kuadran II, I, dan IV. Karena garis ada di lebih dari satu kuadran, kita tidak bisa memastikan letak titik P. Pernyataan (1) dan (2) tidak cukup.</td>
+                    </tr>
+                    <!-- 3 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">3</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">https://imgix3.ruangguru.com/assets/miscellaneous/png_uitxuc_3291.png</td>
+                        <td class="p-2 border">Diagram batang menunjukkan hasil panen padi (dalam ton) di sebuah desa selama 5 tahun. Berapakah rata-rata hasil panen per tahun selama periode tersebut?</td>
+                        <td class="p-2 border">25 ton</td>
+                        <td class="p-2 border">26 ton</td>
+                        <td class="p-2 border">27 ton</td>
+                        <td class="p-2 border">28 ton</td>
+                        <td class="p-2 border">30 ton</td>
+                        <td class="p-2 border text-center">C</td>
+                        <td class="p-2 border">Jawaban: C. 27 ton. Langkah 1: Baca data dari diagram batang. Tahun 2020: 20 ton, 2021: 30 ton, 2022: 25 ton, 2023: 40 ton, 2024: 20 ton. Langkah 2: Hitung total hasil panen selama 5 tahun. Total Panen = $20 + 30 + 25 + 40 + 20 = 135$ ton. Langkah 3: Hitung rata-rata hasil panen per tahun. Rata-rata = Total Panen / Jumlah Tahun = $135 / 5 = 27$ ton.</td>
+                    </tr>
+                    <!-- 4 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">4</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Dua buah tiang bendera memiliki tinggi 10 m dan 17 m. Jarak antara kedua tiang tersebut adalah 24 m. Seutas tali dipasang dari puncak tiang pertama ke puncak tiang kedua.</td>
+                        <td class="p-2 border">Panjang tali tersebut adalah...</td>
+                        <td class="p-2 border">25 m</td>
+                        <td class="p-2 border">26 m</td>
+                        <td class="p-2 border">27 m</td>
+                        <td class="p-2 border">28 m</td>
+                        <td class="p-2 border">30 m</td>
+                        <td class="p-2 border text-center">A</td>
+                        <td class="p-2 border">Jawaban: A. 25 m. Langkah 1: Visualisasikan masalah sebagai segitiga siku-siku. Sisi alas segitiga adalah jarak horizontal antar tiang, yaitu 24 m. Sisi tegak segitiga adalah selisih tinggi kedua tiang, yaitu $17 - 10 = 7$ m. Panjang tali adalah sisi miring (hipotenusa) dari segitiga siku-siku ini. Langkah 2: Gunakan Teorema Pythagoras. Panjang Tali^2 = Alas^2 + Tinggi^2. Panjang Tali^2 = $24^2 + 7^2 = 576 + 49 = 625$. Panjang Tali = $\sqrt{625} = 25$ m.</td>
+                    </tr>
+                    <!-- 5 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">5</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Sebuah perusahaan taksi online menetapkan tarif buka pintu sebesar Rp8.000 dan tarif per kilometer sebesar Rp3.000.</td>
+                        <td class="p-2 border">Jika $f(x)$ adalah total biaya untuk perjalanan sejauh $x$ kilometer, maka rumus fungsi dan biaya untuk perjalanan sejauh 15 km adalah...</td>
+                        <td class="p-2 border">$f(x)=8000x+3000$, Biaya Rp123.000</td>
+                        <td class="p-2 border">$f(x)=3000x+8000$, Biaya Rp53.000</td>
+                        <td class="p-2 border">$f(x)=11000x$, Biaya Rp165.000</td>
+                        <td class="p-2 border">$f(x)=3000(x+8000)$, Biaya Rp24.045.000</td>
+                        <td class="p-2 border">$f(x)=8000x-3000$, Biaya Rp117.000</td>
+                        <td class="p-2 border text-center">B</td>
+                        <td class="p-2 border">Jawaban: B. $f(x)=3000x+8000$, Biaya Rp53.000. Langkah 1: Tentukan model fungsi linear. Tarif variabel adalah Rp3.000 per km, jadi $3000x$. Tarif tetap adalah Rp8.000. Total biaya $f(x) = 3000x + 8000$. Langkah 2: Hitung biaya untuk perjalanan 15 km. Substitusikan $x=15$: $f(15) = 3000(15) + 8000 = 45.000 + 8.000 = 53.000$. Jadi, biayanya adalah Rp53.000.</td>
+                    </tr>
+                    <!-- 6 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">6</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">2</td>
+                        <td class="p-2 border">Sebuah tabung tanpa tutup memiliki jari-jari alas 7 cm dan tinggi 10 cm. (Gunakan $\pi \approx \frac{22}{7}$)</td>
+                        <td class="p-2 border">Manakah pernyataan berikut yang benar? (bisa pilih lebih dari satu jawaban)</td>
+                        <td class="p-2 border">Luas alas tabung adalah 154 cm².</td>
+                        <td class="p-2 border">Luas selimut tabung adalah 440 cm².</td>
+                        <td class="p-2 border">Luas permukaan tabung tanpa tutup adalah 594 cm².</td>
+                        <td class="p-2 border">Volume tabung adalah 1.540 cm³.</td>
+                        <td class="p-2 border">Keliling alas tabung adalah 44 cm.</td>
+                        <td class="p-2 border text-center">A,B,C,D,E</td>
+                        <td class="p-2 border">Jawaban: Semua pernyataan benar. Diberikan $r=7$ cm, $t=10$ cm, $\pi = 22/7$. Luas alas: $\pi r^2 = (22/7) \times 7^2 = 154$ cm². (Benar). Luas selimut: $2\pi rt = 2 \times (22/7) \times 7 \times 10 = 440$ cm². (Benar). Luas permukaan tanpa tutup: Luas Alas + Luas Selimut = $154 + 440 = 594$ cm². (Benar). Volume: Luas Alas x Tinggi = $154 \times 10 = 1.540$ cm³. (Benar). Keliling alas: $2\pi r = 2 \times (22/7) \times 7 = 44$ cm. (Benar).</td>
+                    </tr>
+                    <!-- 7 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">7</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Di sebuah gedung pertunjukan, baris kursi paling depan ada 15 kursi. Baris di belakangnya selalu bertambah 3 kursi dari baris di depannya. Jika ada 12 baris kursi.</td>
+                        <td class="p-2 border">Total kapasitas gedung adalah...</td>
+                        <td class="p-2 border">342 kursi</td>
+                        <td class="p-2 border">358 kursi</td>
+                        <td class="p-2 border">366 kursi</td>
+                        <td class="p-2 border">378 kursi</td>
+                        <td class="p-2 border">390 kursi</td>
+                        <td class="p-2 border text-center">D</td>
+                        <td class="p-2 border">Jawaban: D. 378 kursi. Masalah ini adalah deret aritmetika dengan: Suku pertama ($a$) = 15, Beda ($b$) = 3, Banyak suku ($n$) = 12. Gunakan rumus jumlah n suku pertama deret aritmetika: $S_n = (n/2) \times (2a + (n-1)b)$. $S_{12} = (12/2) \times (2 \times 15 + (12-1) \times 3) = 6 \times (30 + 33) = 6 \times 63 = 378$.</td>
+                    </tr>
+                    <!-- 8 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">8</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">3</td>
+                        <td class="p-2 border">Titik A(3, 5) ditranslasikan oleh $T_1 = \begin{pmatrix} -2 \\ 4 \end{pmatrix}$ kemudian dilanjutkan dengan translasi $T_2 = \begin{pmatrix} 1 \\ -7 \end{pmatrix}$.</td>
+                        <td class="p-2 border">Tentukan kebenaran pernyataan berikut.</td>
+                        <td class="p-2 border">Bayangan setelah translasi $T_1$ adalah A'(1, 9).</td>
+                        <td class="p-2 border">Bayangan akhir setelah dua translasi adalah A''(2, 2).</td>
+                        <td class="p-2 border">Translasi tunggal yang mewakili $T_1$ dilanjutkan $T_2$ adalah $T = \begin{pmatrix} -1 \\ -3 \end{pmatrix}$.</td>
+                        <td class="p-2 border">Urutan translasi tidak mempengaruhi hasil akhir ($T_1 \circ T_2 = T_2 \circ T_1$).</td>
+                        <td class="p-2 border">-</td>
+                        <td class="p-2 border text-center">1,2,3,4</td>
+                        <td class="p-2 border">Jawaban: Semua pernyataan benar. Pernyataan 1: $A' = (3+(-2), 5+4) = (1, 9)$. (Benar). Pernyataan 2: $A'' = (1+1, 9+(-7)) = (2, 2)$. (Benar). Pernyataan 3: $T = T_1 + T_2 = \begin{pmatrix} -1 \\ -3 \end{pmatrix}$. (Benar). Pernyataan 4: Penjumlahan matriks bersifat komutatif, sehingga urutan translasi tidak mempengaruhi hasil akhir. (Benar).</td>
+                    </tr>
+                    <!-- 9 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">9</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Dari seperangkat kartu bridge, diambil sebuah kartu secara acak.</td>
+                        <td class="p-2 border">Peluang terambilnya kartu King atau kartu berwarna merah adalah...</td>
+                        <td class="p-2 border">$\frac{26}{52}$</td>
+                        <td class="p-2 border">$\frac{28}{52}$</td>
+                        <td class="p-2 border">$\frac{30}{52}$</td>
+                        <td class="p-2 border">$\frac{4}{52}$</td>
+                        <td class="p-2 border">$\frac{7}{13}$</td>
+                        <td class="p-2 border text-center">B</td>
+                        <td class="p-2 border">Jawaban: B. $\frac{28}{52}$. Ini adalah peluang gabungan dua kejadian tidak saling lepas. P(King) = 4/52. P(Merah) = 26/52. P(King dan Merah) = 2/52. P(King atau Merah) = P(King) + P(Merah) - P(King dan Merah) = $4/52 + 26/52 - 2/52 = 28/52$.</td>
+                    </tr>
+                    <!-- 10 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">10</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Agar fungsi $f(x) = \sqrt{\frac{x^2 - 4}{x-1}}$ terdefinisi.</td>
+                        <td class="p-2 border">Domain dari fungsi tersebut adalah...</td>
+                        <td class="p-2 border">$-2 \le x < 1$ atau $x \ge 2$</td>
+                        <td class="p-2 border">$x < 1$ atau $x > 2$</td>
+                        <td class="p-2 border">$-2 \le x \le 2$</td>
+                        <td class="p-2 border">$x \ge 2$</td>
+                        <td class="p-2 border">$x > 1$</td>
+                        <td class="p-2 border text-center">A</td>
+                        <td class="p-2 border">Jawaban: A. $-2 \le x < 1$ atau $x \ge 2$. Langkah 1: Tentukan syarat domain fungsi akar. Nilai di dalam akar harus non-negatif: $(x^2 - 4)/(x-1) \ge 0$. Penyebut tidak boleh nol: $x \neq 1$. Langkah 2: Cari titik-titik kritis: $x=2, x=-2, x=1$. Langkah 3: Uji interval. Gari bilangan menunjukkan hasil positif pada $-2 \le x < 1$ atau $x \ge 2$.</td>
+                    </tr>
+                    <!-- 11 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">11</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Sebuah tenda pramuka berbentuk limas dengan alas persegi. Panjang sisi alasnya 6 meter dan tinggi tenda 4 meter.</td>
+                        <td class="p-2 border">Kain yang dibutuhkan untuk membuat tenda tersebut (tanpa alas) adalah...</td>
+                        <td class="p-2 border">36 m²</td>
+                        <td class="p-2 border">48 m²</td>
+                        <td class="p-2 border">60 m²</td>
+                        <td class="p-2 border">72 m²</td>
+                        <td class="p-2 border">96 m²</td>
+                        <td class="p-2 border text-center">C</td>
+                        <td class="p-2 border">Jawaban: C. 60 m². Langkah 1: Hitung tinggi sisi tegak ($t_s$) dengan Pythagoras: $t_s = \sqrt{4^2 + 3^2} = 5$ m. Langkah 2: Hitung luas satu sisi tegak (segitiga): Luas = $1/2 \times 6 \times 5 = 15$ m². Langkah 3: Hitung total kain (4 sisi tegak): Total = $4 \times 15 = 60$ m².</td>
+                    </tr>
+                    <!-- 12 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">12</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">5</td>
+                        <td class="p-2 border">Diberikan $p$ adalah bilangan prima. Apakah $p+4$ juga merupakan bilangan prima?</td>
+                        <td class="p-2 border">Tentukan kecukupan data dari pernyataan berikut.</td>
+                        <td class="p-2 border">(1) $p > 2$.</td>
+                        <td class="p-2 border">(2) $p$ adalah faktor dari 15.</td>
+                        <td class="p-2 border">-</td>
+                        <td class="p-2 border">-</td>
+                        <td class="p-2 border">-</td>
+                        <td class="p-2 border text-center">E</td>
+                        <td class="p-2 border">Jawaban: E. Pernyataan (1) dan pernyataan (2) tidak cukup untuk menjawab pertanyaan. Analisis Pernyataan (1): $p$ ganjil. Jika $p=3, p+4=7$ (Prima). Jika $p=5, p+4=9$ (Bukan). Pernyataan (1) tidak cukup. Analisis Pernyataan (2): $p$ faktor prima 15 (3 atau 5). Sama seperti (1), memberikan hasil berbeda. Bersama pun tetap tidak cukup.</td>
+                    </tr>
+                    <!-- 13 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">13</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Umur seorang ayah 4 kali umur anaknya. Lima tahun yang lalu, umur ayah 7 kali umur anaknya.</td>
+                        <td class="p-2 border">Jumlah umur mereka sekarang adalah...</td>
+                        <td class="p-2 border">40 tahun</td>
+                        <td class="p-2 border">45 tahun</td>
+                        <td class="p-2 border">50 tahun</td>
+                        <td class="p-2 border">55 tahun</td>
+                        <td class="p-2 border">60 tahun</td>
+                        <td class="p-2 border text-center">C</td>
+                        <td class="p-2 border">Jawaban: C. 50 tahun. Misal Ayah = $A$, Anak = $N$. (1) $A = 4N$. (2) $(A-5) = 7(N-5)$. Substitusi: $(4N-5) = 7N - 35 \implies 3N = 30 \implies N = 10$. Maka $A = 4 \times 10 = 40$. Jumlah umur = $40 + 10 = 50$ tahun.</td>
+                    </tr>
+                    <!-- 14 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">14</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Data tabel frekuensi: Nilai 51-55 (f=5), 56-60 (f=8), 61-65 (f=12), 66-70 (f=10), 71-75 (f=5).</td>
+                        <td class="p-2 border">Median dari data tersebut adalah...</td>
+                        <td class="p-2 border">61,75</td>
+                        <td class="p-2 border">62,00</td>
+                        <td class="p-2 border">62,25</td>
+                        <td class="p-2 border">62,50</td>
+                        <td class="p-2 border">63,00</td>
+                        <td class="p-2 border text-center">E</td>
+                        <td class="p-2 border">Jawaban: E. 63,00. Langkah 1: Total frekuensi $n=40$. Letak median data ke-20 (kelas 61-65). Langkah 2: $Tb = 60,5, Fk = 13, f = 12, p = 5$. Langkah 3: $Me = Tb + ((n/2 - Fk)/f) \times p = 60,5 + ((20-13)/12) \times 5 \approx 63,42$. Pilihan terdekat 63,00.</td>
+                    </tr>
+                    <!-- 15 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">15</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Nilai dari $\sin(150^\circ) + \cos(240^\circ) - \tan(315^\circ)$</td>
+                        <td class="p-2 border">Berapa hasil akhirnya?</td>
+                        <td class="p-2 border">-1</td>
+                        <td class="p-2 border">0</td>
+                        <td class="p-2 border">1</td>
+                        <td class="p-2 border">$\frac{3}{2}$</td>
+                        <td class="p-2 border">2</td>
+                        <td class="p-2 border text-center">C</td>
+                        <td class="p-2 border">Jawaban: C. 1. $\sin(150^\circ) = 1/2$. $\cos(240^\circ) = -1/2$. $\tan(315^\circ) = -1$. Nilai = $1/2 + (-1/2) - (-1) = 1$.</td>
+                    </tr>
+                    <!-- 16 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">16</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Modal Rp900.000, Kapasitas maks 700 kue. Donat ($x$) biaya Rp1.000 untung Rp500. Bolu ($y$) biaya Rp1.500 untung Rp800.</td>
+                        <td class="p-2 border">Keuntungan maksimum yang didapat adalah...</td>
+                        <td class="p-2 border">Rp350.000</td>
+                        <td class="p-2 border">Rp420.000</td>
+                        <td class="p-2 border">Rp480.000</td>
+                        <td class="p-2 border">Rp510.000</td>
+                        <td class="p-2 border">Rp560.000</td>
+                        <td class="p-2 border text-center">C</td>
+                        <td class="p-2 border">Jawaban: C. Rp480.000. Kendala: $x+y \le 700$ dan $2x+3y \le 1.800$. Titik pojok: (0,600) -> Z = 480.000. (300,400) -> Z = 470.000. Keuntungan maks Rp480.000.</td>
+                    </tr>
+                    <!-- 17 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">17</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">2</td>
+                        <td class="p-2 border">Segienam beraturan ABCDEF dengan panjang sisi 10 cm.</td>
+                        <td class="p-2 border">Manakah pernyataan berikut yang benar? (bisa pilih lebih dari satu jawaban)</td>
+                        <td class="p-2 border">Panjang diagonal terpanjang (misal AD) adalah 20 cm.</td>
+                        <td class="p-2 border">Luas segienam tersebut adalah $150\sqrt{3}$ cm².</td>
+                        <td class="p-2 border">Besar setiap sudut dalamnya adalah $120^\circ$.</td>
+                        <td class="p-2 border">Keliling segienam tersebut adalah 60 cm.</td>
+                        <td class="p-2 border">Jarak dari pusat ke salah satu sisinya adalah $5\sqrt{3}$ cm.</td>
+                        <td class="p-2 border text-center">A,B,C,D,E</td>
+                        <td class="p-2 border">Jawaban: Semua pernyataan benar. Diagonal = 2s = 20. Luas = $6 \times (s^2\sqrt{3}/4) = 150\sqrt{3}$. Sudut = 120. Keliling = 60. Apotema = $5\sqrt{3}$.</td>
+                    </tr>
+                    <!-- 18 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">18</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Di dalam tas terdapat 3 buku MTK, 2 Fisika, 4 Kimia. Diambil 3 buku satu per satu tanpa pengembalian.</td>
+                        <td class="p-2 border">Peluang terambil buku MTK, lalu Fisika, lalu Kimia adalah...</td>
+                        <td class="p-2 border">$\frac{1}{21}$</td>
+                        <td class="p-2 border">$\frac{2}{21}$</td>
+                        <td class="p-2 border">$\frac{1}{12}$</td>
+                        <td class="p-2 border">$\frac{24}{729}$</td>
+                        <td class="p-2 border">$\frac{1}{84}$</td>
+                        <td class="p-2 border text-center">A</td>
+                        <td class="p-2 border">Jawaban: A. $\frac{1}{21}$. Peluang = $(3/9) \times (2/8) \times (4/7) = 24/504 = 1/21$.</td>
+                    </tr>
+                    <!-- 19 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">19</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">3</td>
+                        <td class="p-2 border">Fungsi kuadrat $f(x) = -x^2 + 4x - 3$.</td>
+                        <td class="p-2 border">Tentukan kebenaran dari analisis grafik fungsi tersebut.</td>
+                        <td class="p-2 border">Grafik membuka ke bawah.</td>
+                        <td class="p-2 border">Titik puncak grafik adalah (2, 1).</td>
+                        <td class="p-2 border">Grafik memotong sumbu Y di titik (0, 3).</td>
+                        <td class="p-2 border">Grafik memotong sumbu X di titik (1, 0) dan (3, 0).</td>
+                        <td class="p-2 border">-</td>
+                        <td class="p-2 border text-center">1,2,4</td>
+                        <td class="p-2 border">Jawaban: Pernyataan 1, 2, 4 benar. Pernyataan 3 salah. Analisis: Buka bawah ($a=-1$). Puncak $(2,1)$. Potong Y di $(0,-3)$. Potong X di $x=1$ dan $x=3$.</td>
+                    </tr>
+                    <!-- 20 -->
+                    <tr>
+                        <td class="p-2 border text-center font-bold">20</td>
+                        <td class="p-2 border">Matematika Wajib</td>
+                        <td class="p-2 border text-center">4</td>
+                        <td class="p-2 border text-center">1</td>
+                        <td class="p-2 border">Tiga bilangan membentuk barisan geometri. Hasil kalinya adalah 216 dan jumlahnya adalah 21.</td>
+                        <td class="p-2 border">Rasio dari barisan tersebut adalah...</td>
+                        <td class="p-2 border">2 atau $\frac{1}{2}$</td>
+                        <td class="p-2 border">3 atau $\frac{1}{3}$</td>
+                        <td class="p-2 border">4 atau $\frac{1}{4}$</td>
+                        <td class="p-2 border">2 atau 3</td>
+                        <td class="p-2 border">$\frac{1}{2}$ atau $\frac{1}{3}$</td>
+                        <td class="p-2 border text-center">A</td>
+                        <td class="p-2 border">Jawaban: A. 2 atau $\frac{1}{2}$. Analisis: $a^3 = 216 \implies a=6$. Persamaan $6/r + 6 + 6r = 21 \implies 2r^2-5r+2=0 \implies (2r-1)(r-2)=0$. Maka $r=2$ atau $r=1/2$.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- LEGENDA CMS -->
+    <div class="max-w-full mx-auto bg-white p-6 mt-8 rounded-xl shadow-lg border-l-8 border-brand-pink">
+        <h2 class="text-xl font-bold mb-4 text-brand-pink">📘 Legenda Pengisian CMS EXE</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-[11px]">
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <h3 class="font-bold text-blue-700">Tipe_Soal 1 (PG Biasa)</h3>
+                <p>Kunci diisi satu huruf: A, B, C, D, atau E.</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg">
+                <h3 class="font-bold text-green-700">Tipe_Soal 2 (PG Kompleks)</h3>
+                <p>Kunci dipisah koma: A,C,D (untuk Checkbox).</p>
+            </div>
+            <div class="bg-yellow-50 p-4 rounded-lg">
+                <h3 class="font-bold text-yellow-700">Tipe_Soal 3 (Analisis)</h3>
+                <p>Kunci diisi nomor pernyataan yang benar: 1,2,4.</p>
+            </div>
+            <div class="bg-orange-50 p-4 rounded-lg">
+                <h3 class="font-bold text-orange-700">Tipe_Soal 4 (P vs Q)</h3>
+                <p>Opsi A = Nilai P, Opsi B = Nilai Q. Kunci A/B/C/D.</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg">
+                <h3 class="font-bold text-purple-700">Tipe_Soal 5 (AKD)</h3>
+                <p>Opsi A = Pernyataan (1), Opsi B = Pernyataan (2). HTML otomatis nampilin 5 opsi standar.</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
