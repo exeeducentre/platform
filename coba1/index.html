@@ -271,6 +271,12 @@
         <!-- 6. VIEW: HASIL & PEMBAHASAN                -->
         <!-- ========================================== -->
         <section id="result-view" class="view-section max-w-5xl mx-auto">
+            <!-- Banner Riwayat -->
+            <div id="history-banner" class="hidden bg-blue-50 border border-blue-200 text-blue-700 px-6 py-4 rounded-2xl mb-8 flex items-center justify-center gap-3">
+                <i class="fas fa-history text-xl"></i>
+                <span class="font-medium text-sm">Kamu sedang melihat riwayat pengerjaan Try Out ini. Data jawabanmu ditarik dari sistem.</span>
+            </div>
+
             <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-100 max-w-4xl mx-auto mb-10 text-center">
                 <h2 class="text-2xl font-bold text-slate-400 mb-2 tracking-widest uppercase">Skor Akhir</h2>
                 <div class="text-8xl font-black text-brand-dark mb-10" id="final-score">0</div>
@@ -341,7 +347,6 @@
                 </div>
             </div>
         </section>
-
     </main>
 
     <script>
@@ -351,8 +356,8 @@
         // URL Database Siswa
         const URL_SISWA = "https://script.google.com/macros/s/AKfycbxaHaTvlAiUUN0FE0deQh--AWuHAIsWdh68JylHpsTA9NftUE-9Ad-g81oTrN-h6RkT/exec"; 
 
-        // URL Submit Nilai Terbaru (yang lo kasih)
-        const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwUkCkGrQyZGfnhHZAAwglFEMHe3YLaGvXylpIJT0dlanUPo4rdnsOOqoSEt41aFfws/exec";
+        // URL API Baru (Menangani GET Riwayat & POST Submit Nilai)
+        const API_URL = "https://script.google.com/macros/s/AKfycbzigR4mLqt7LZkKSmPzDnAiqESRA9H1QnlX4zDxWss5w9HB-8g337mCT7VcxS3Om9sU/exec";
 
         let dataSiswa = [];
         let selectedSiswa = null;
@@ -416,17 +421,15 @@
             if (isCorrect && selectedSiswa) {
                 const namaDepan = selectedSiswa.Nama.split(' ')[0];
                 document.getElementById('display-nama').innerText = namaDepan;
-                document.getElementById('dash-nama').innerText = namaDepan; // Set nama di Dashboard
+                document.getElementById('dash-nama').innerText = namaDepan;
                 document.getElementById('nav-user-menu').classList.remove('hidden');
                 
                 navigateTo('dashboard-view');
                 
-                // Reset form
                 document.getElementById('login-confirm-section').classList.add('hidden');
                 document.getElementById('login-input-section').classList.remove('hidden');
                 document.getElementById('input-nama').value = "";
             } else {
-                // Batalkan
                 document.getElementById('login-confirm-section').classList.add('hidden');
                 document.getElementById('login-input-section').classList.remove('hidden');
                 document.getElementById('input-nama').value = "";
@@ -462,39 +465,70 @@
             document.getElementById('exam-footer').style.display = (viewId === 'exam-view') ? 'flex' : 'none';
         }
 
-        // Langkah 1: Pilih TO 1-6 dari Menu Try Out
         function selectTO(toNo) {
             selectedTO = toNo;
             document.getElementById('selected-to-label').innerText = `Try Out ${selectedTO}`;
             navigateTo('subject-select-view');
         }
 
-        // Langkah 2: Pilih Mapel di dalam TO tersebut
-        function chooseSubject(subject) {
-            selectedSubject = subject;
-            startExam(); 
+        // HELPER: Untuk fetch soal dari database
+        async function fetchAndFilterSoal() {
+            if (allSoalData.length === 0) {
+                const response = await fetch(SCRIPT_URL);
+                const json = await response.json();
+                allSoalData = Array.isArray(json) ? json : [];
+            }
+            currentSoalFiltered = allSoalData.filter((s) => String(s.Mapel).trim() === selectedSubject && Number(s.TO_Ke) === selectedTO);
         }
 
-        // Langkah 3: Tarik Soal dan Mulai
+        // --- FUNGSI BARU: MENGAMBIL RIWAYAT SEBELUM UJIAN ---
+        async function chooseSubject(subject) {
+            selectedSubject = subject;
+            
+            document.getElementById('exam-title').innerText = "Mengecek Riwayat...";
+            document.getElementById('review-container').classList.add('hidden');
+            document.getElementById('btn-submit').classList.add('hidden');
+            document.getElementById('history-banner').classList.add('hidden');
+            navigateTo('exam-view'); 
+            
+            const container = document.getElementById('exam-container');
+            container.innerHTML = `<div class="text-center py-20"><i class="fas fa-circle-notch fa-spin text-4xl text-brand-pink mb-4"></i><p class="text-gray-500 font-medium tracking-tight">Mengecek riwayat pengerjaan kamu...</p></div>`;
+
+            try {
+                const nama = selectedSiswa ? selectedSiswa.Nama : "Anonim";
+                const checkUrl = `${API_URL}?nama=${encodeURIComponent(nama)}&mapel=${encodeURIComponent(selectedSubject)}&to_ke=${selectedTO}`;
+                
+                // Fetch riwayat ke App Script
+                const response = await fetch(checkUrl);
+                const result = await response.json();
+                
+                if (result.status === "found") {
+                    // JIKA UDAH NGERJAIN -> Tarik soal dan langsung buat halaman review
+                    await fetchAndFilterSoal(); 
+                    userAnswers = result.jawaban_user || {}; 
+                    
+                    // Eksekusi logic perhitungan tanpa submit ke API lagi
+                    processExamResult(true, result.skor); 
+                } else {
+                    // JIKA BELUM NGERJAIN -> Mulai ujian normal
+                    startExam(); 
+                }
+            } catch (err) {
+                console.error("Gagal ngecek riwayat", err);
+                startExam(); // Fallback kalau error, biarkan ujian normal
+            }
+        }
+
         async function startExam() {
             userAnswers = {};
-            document.getElementById('review-container').classList.add('hidden');
-            navigateTo('exam-view');
             document.getElementById('exam-title').innerText = `${selectedSubject} - TO ${selectedTO}`;
-            document.getElementById('btn-submit').classList.add('hidden');
             
             const container = document.getElementById('exam-container');
             container.innerHTML = `<div class="text-center py-20"><i class="fas fa-circle-notch fa-spin text-4xl text-brand-pink mb-4"></i><p class="text-gray-500 font-medium tracking-tight">Menyusun soal...</p></div>`;
 
             try {
-                if (allSoalData.length === 0) {
-                    const response = await fetch(SCRIPT_URL);
-                    const json = await response.json();
-                    allSoalData = Array.isArray(json) ? json : [];
-                }
-                
-                currentSoalFiltered = allSoalData.filter((s) => String(s.Mapel).trim() === selectedSubject && Number(s.TO_Ke) === selectedTO);
-                
+                await fetchAndFilterSoal();
+
                 if (currentSoalFiltered.length === 0) {
                     container.innerHTML = `<div class='p-12 text-center text-gray-500 bg-white rounded-3xl border border-dashed border-slate-300'><p class='font-bold text-lg'>Soal Belum Tersedia!</p></div>`;
                     return;
@@ -502,7 +536,9 @@
                 
                 renderSoalList();
                 document.getElementById('btn-submit').classList.remove('hidden');
-                initTimer(60); // 60 Menit default
+                document.getElementById('btn-submit').innerHTML = 'Selesai & Kumpulkan Jawaban';
+                document.getElementById('btn-submit').disabled = false;
+                initTimer(60); 
                 
             } catch (err) {
                 container.innerHTML = `<div class='p-12 text-center text-red-500 bg-red-50 rounded-3xl border border-red-200'><p class='font-bold'>Eror Koneksi Database!</p></div>`;
@@ -671,23 +707,32 @@
             userAnswers[no][rowNo] = val;
         }
 
-        // --- SUBMIT UJIAN KE SPREADSHEET (DIUBAH JADI ASYNC) ---
+        // --- SUBMIT UJIAN (Dipanggil kalau baru pertama kali ngerjain) ---
         async function submitExam() {
             clearInterval(timerInterval);
 
-            // Ubah tampilan tombol biar kelihatan proses loading
             const btnSubmit = document.getElementById('btn-submit');
             if (btnSubmit) {
                 btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim Jawaban...';
                 btnSubmit.disabled = true;
             }
 
+            // Panggil proses evaluasi (isHistoryMode = false)
+            await processExamResult(false);
+            
+            if (btnSubmit) {
+                btnSubmit.innerHTML = 'Selesai & Kumpulkan Jawaban';
+                btnSubmit.disabled = false;
+            }
+        }
+
+        // --- FUNGSI INTI: EVALUASI & RENDER HASIL (Dipakai di submit maupun review) ---
+        async function processExamResult(isHistoryMode = false, historyScore = null) {
             let correct = 0;
             let topicAnalysis = {};
             const reviewList = document.getElementById('review-list');
             reviewList.innerHTML = "";
 
-            // PROSES PERHITUNGAN JAWABAN (Logic asli)
             currentSoalFiltered.forEach((s, idx) => {
                 const no = s.No_Soal || (idx + 1);
                 const type = Number(s.Tipe_Soal);
@@ -746,7 +791,7 @@
                                     ${stmts.map((stmt, i) => {
                                         const isKunciB = benerRows.includes(String(i+1));
                                         const isKunciS = !isKunciB;
-                                        const userAns = ansObj[i+1]; 
+                                        const userAns = ansObj[i+1];
                                         
                                         const iconB = isKunciB ? '<i class="fas fa-check-circle text-green-500 text-xl"></i>' : (userAns === 'B' ? '<i class="fas fa-times-circle text-red-500 text-xl"></i>' : '-');
                                         const iconS = isKunciS ? '<i class="fas fa-check-circle text-green-500 text-xl"></i>' : (userAns === 'S' ? '<i class="fas fa-times-circle text-red-500 text-xl"></i>' : '-');
@@ -850,7 +895,6 @@
                 }
                 optionsReviewBlock += `</div>`;
 
-
                 // === Render Review Card ===
                 const reviewCard = document.createElement('div');
                 reviewCard.className = `bg-white p-6 md:p-8 rounded-3xl shadow-sm border ${isCorrect ? 'is-correct' : 'is-wrong'}`;
@@ -877,22 +921,22 @@
                 reviewList.appendChild(reviewCard);
             });
 
-            // HITUNG SKOR FINAL
-            const finalScore = Math.round((correct / currentSoalFiltered.length) * 100);
+            // HITUNG SKOR FINAL (Ambil dari History kalau ada, kalau tidak kalkulasi baru)
+            const finalScore = (isHistoryMode && historyScore !== null) 
+                                ? historyScore 
+                                : Math.round((correct / currentSoalFiltered.length) * 100);
+            
             document.getElementById('final-score').innerText = finalScore;
             
             // SIAPKAN DATA UNTUK UI & PAYLOAD APP SCRIPT
             const analysisBody = document.getElementById('analysis-body');
             analysisBody.innerHTML = "";
-            let analisisTeks = ""; // Buat dikirim ke Spreadsheet
+            let analisisTeks = ""; 
 
             for (const t in topicAnalysis) {
                 const acc = Math.round((topicAnalysis[t].correct / topicAnalysis[t].total) * 100);
-                
-                // Tambah string buat Sheet
                 analisisTeks += `${t}: ${topicAnalysis[t].correct}/${topicAnalysis[t].total} (${acc}%), `;
 
-                // Gambar baris tabel buat UI
                 analysisBody.innerHTML += `
                     <tr>
                         <td class="p-4 font-bold text-slate-600 uppercase text-[10px]">${t}</td>
@@ -904,34 +948,36 @@
                     </tr>`;
             }
 
-            // === KIRIM PAYLOAD KE GOOGLE APPS SCRIPT ===
-            const payloadData = {
-                nama: selectedSiswa ? selectedSiswa.Nama : "Anonim",
-                kelas: selectedSiswa ? (selectedSiswa.Kelas || "-") : "-",
-                sekolah: selectedSiswa ? (selectedSiswa.Asal_Sekolah || selectedSiswa['Asal Sekolah'] || "-") : "-",
-                mapel: selectedSubject,
-                to_ke: selectedTO,
-                skor: finalScore,
-                analisis: analisisTeks
-            };
+            // === KIRIM PAYLOAD KE GOOGLE APPS SCRIPT (HANYA JIKA BUKAN MODE RIWAYAT) ===
+            if (!isHistoryMode) {
+                const payloadData = {
+                    nama: selectedSiswa ? selectedSiswa.Nama : "Anonim",
+                    kelas: selectedSiswa ? (selectedSiswa.Kelas || "-") : "-",
+                    sekolah: selectedSiswa ? (selectedSiswa.Asal_Sekolah || selectedSiswa['Asal Sekolah'] || "-") : "-",
+                    mapel: selectedSubject,
+                    to_ke: selectedTO,
+                    skor: finalScore,
+                    analisis: analisisTeks,
+                    jawaban_user: userAnswers // <--- JAWABAN SEKARANG DISIMPAN!
+                };
 
-            try {
-                // Trik: pakai content-type text/plain biar App Script gak nolak karena CORS preflight
-                await fetch(SUBMIT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payloadData)
-                });
-                console.log("Sukses simpan ke Database!");
-            } catch (error) {
-                console.error("Gagal simpan ke database:", error);
-                // Kita diamkan saja atau log, user tetep dapet lihat nilainya
+                try {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify(payloadData)
+                    });
+                    console.log("Sukses simpan ke Database!");
+                } catch (error) {
+                    console.error("Gagal simpan ke database:", error);
+                }
             }
-            
-            // KEMBALIKAN TOMBOL KE SEMULA
-            if (btnSubmit) {
-                btnSubmit.innerHTML = 'Selesai & Kumpulkan Jawaban';
-                btnSubmit.disabled = false;
+
+            // Tampilkan atau sembunyikan banner history
+            if (isHistoryMode) {
+                document.getElementById('history-banner').classList.remove('hidden');
+            } else {
+                document.getElementById('history-banner').classList.add('hidden');
             }
 
             // LANJUT KE HALAMAN RESULT
