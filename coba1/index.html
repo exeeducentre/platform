@@ -55,6 +55,7 @@
         ::-webkit-scrollbar-thumb { background: #d81b60; border-radius: 10px; }
         .is-correct { border: 2px solid #10b981 !important; background-color: #f0fdf4 !important; }
         .is-wrong { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
+        button:disabled { opacity: 0.7; cursor: not-allowed; }
     </style>
 </head>
 <body class="font-sans text-gray-800 antialiased bg-slate-50 relative min-h-screen flex flex-col">
@@ -189,7 +190,6 @@
             <p class="text-slate-500 mb-10 text-sm">Pilih sesi ujian Try Out yang ingin kamu kerjakan.</p>
             
             <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                <!-- Generate otomatis 1-6 via JS atau manual -->
                 <button onclick="selectTO(1)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
                     <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 1</h3>
                 </button>
@@ -263,7 +263,7 @@
             </div>
 
             <div id="exam-footer" class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md border-t p-4 flex justify-center z-50" style="display: none;">
-                <button onclick="submitExam()" id="btn-submit" class="hidden px-16 py-4 bg-brand-pink text-white rounded-2xl font-bold hover:bg-brand-dark shadow-2xl hover:-translate-y-1 transition-all">Selesai & Kumpulkan Jawaban</button>
+                <button onclick="submitExam()" id="btn-submit" class="hidden px-16 py-4 bg-brand-pink text-white rounded-2xl font-bold hover:bg-brand-dark shadow-2xl hover:-translate-y-1 transition-all disabled:hover:translate-y-0 disabled:hover:bg-brand-pink disabled:shadow-none">Selesai & Kumpulkan Jawaban</button>
             </div>
         </section>
 
@@ -350,6 +350,9 @@
         
         // URL Database Siswa
         const URL_SISWA = "https://script.google.com/macros/s/AKfycbxaHaTvlAiUUN0FE0deQh--AWuHAIsWdh68JylHpsTA9NftUE-9Ad-g81oTrN-h6RkT/exec"; 
+
+        // URL Submit Nilai Terbaru (yang lo kasih)
+        const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwUkCkGrQyZGfnhHZAAwglFEMHe3YLaGvXylpIJT0dlanUPo4rdnsOOqoSEt41aFfws/exec";
 
         let dataSiswa = [];
         let selectedSiswa = null;
@@ -668,13 +671,23 @@
             userAnswers[no][rowNo] = val;
         }
 
-        function submitExam() {
+        // --- SUBMIT UJIAN KE SPREADSHEET (DIUBAH JADI ASYNC) ---
+        async function submitExam() {
             clearInterval(timerInterval);
+
+            // Ubah tampilan tombol biar kelihatan proses loading
+            const btnSubmit = document.getElementById('btn-submit');
+            if (btnSubmit) {
+                btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim Jawaban...';
+                btnSubmit.disabled = true;
+            }
+
             let correct = 0;
             let topicAnalysis = {};
             const reviewList = document.getElementById('review-list');
             reviewList.innerHTML = "";
 
+            // PROSES PERHITUNGAN JAWABAN (Logic asli)
             currentSoalFiltered.forEach((s, idx) => {
                 const no = s.No_Soal || (idx + 1);
                 const type = Number(s.Tipe_Soal);
@@ -864,12 +877,22 @@
                 reviewList.appendChild(reviewCard);
             });
 
-            document.getElementById('final-score').innerText = Math.round((correct / currentSoalFiltered.length) * 100);
+            // HITUNG SKOR FINAL
+            const finalScore = Math.round((correct / currentSoalFiltered.length) * 100);
+            document.getElementById('final-score').innerText = finalScore;
             
+            // SIAPKAN DATA UNTUK UI & PAYLOAD APP SCRIPT
             const analysisBody = document.getElementById('analysis-body');
             analysisBody.innerHTML = "";
+            let analisisTeks = ""; // Buat dikirim ke Spreadsheet
+
             for (const t in topicAnalysis) {
                 const acc = Math.round((topicAnalysis[t].correct / topicAnalysis[t].total) * 100);
+                
+                // Tambah string buat Sheet
+                analisisTeks += `${t}: ${topicAnalysis[t].correct}/${topicAnalysis[t].total} (${acc}%), `;
+
+                // Gambar baris tabel buat UI
                 analysisBody.innerHTML += `
                     <tr>
                         <td class="p-4 font-bold text-slate-600 uppercase text-[10px]">${t}</td>
@@ -880,7 +903,38 @@
                         </td>
                     </tr>`;
             }
+
+            // === KIRIM PAYLOAD KE GOOGLE APPS SCRIPT ===
+            const payloadData = {
+                nama: selectedSiswa ? selectedSiswa.Nama : "Anonim",
+                kelas: selectedSiswa ? (selectedSiswa.Kelas || "-") : "-",
+                sekolah: selectedSiswa ? (selectedSiswa.Asal_Sekolah || selectedSiswa['Asal Sekolah'] || "-") : "-",
+                mapel: selectedSubject,
+                to_ke: selectedTO,
+                skor: finalScore,
+                analisis: analisisTeks
+            };
+
+            try {
+                // Trik: pakai content-type text/plain biar App Script gak nolak karena CORS preflight
+                await fetch(SUBMIT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payloadData)
+                });
+                console.log("Sukses simpan ke Database!");
+            } catch (error) {
+                console.error("Gagal simpan ke database:", error);
+                // Kita diamkan saja atau log, user tetep dapet lihat nilainya
+            }
             
+            // KEMBALIKAN TOMBOL KE SEMULA
+            if (btnSubmit) {
+                btnSubmit.innerHTML = 'Selesai & Kumpulkan Jawaban';
+                btnSubmit.disabled = false;
+            }
+
+            // LANJUT KE HALAMAN RESULT
             navigateTo('result-view');
             triggerMath(reviewList);
         }
