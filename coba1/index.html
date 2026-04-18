@@ -57,12 +57,12 @@
         .is-wrong { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
     </style>
 </head>
-<body class="font-sans text-gray-800 antialiased bg-slate-50 min-h-screen flex flex-col">
+<body class="font-sans text-gray-800 antialiased bg-slate-50 relative min-h-screen flex flex-col">
 
     <!-- NAVBAR -->
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex justify-between items-center">
-            <div class="flex items-center cursor-pointer" onclick="navigateTo('dashboard-view')">
+            <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="navigateTo('dashboard-view')">
                 <img class="h-10 w-auto" src="https://images2.imgbox.com/ad/c5/3XFVIZZN_o.png" alt="Logo EXE">
             </div>
             <div id="nav-user-menu" class="hidden flex items-center space-x-4 text-sm font-semibold text-slate-600">
@@ -72,12 +72,16 @@
         </div>
     </nav>
 
-    <main class="flex-grow pt-24 pb-12 px-4 max-w-5xl mx-auto w-full text-brand-dark">
+    <!-- KONTEN UTAMA -->
+    <main class="flex-grow pt-24 pb-12 px-4 max-w-7xl mx-auto w-full text-brand-dark">
         
-        <!-- LOGIN VIEW -->
+        <!-- ========================================== -->
+        <!-- 1. VIEW: LOGIN                             -->
+        <!-- ========================================== -->
         <section id="auth-view" class="view-section active max-w-md mx-auto mt-10">
             <div class="bg-white p-10 rounded-3xl shadow-xl border border-slate-100 text-center">
-                <h2 class="text-3xl font-bold mb-8">Masuk Platform</h2>
+                <h2 class="text-3xl font-bold text-brand-dark mb-2">Exe Students Centre</h2>
+                <p class="text-gray-500 text-sm mb-8">Silakan temukan nama kamu untuk mulai belajar</p>
                 
                 <!-- Animasi Loading saat fetch data siswa -->
                 <div id="login-loading" class="hidden my-6">
@@ -112,24 +116,125 @@
             </div>
         </section>
 
-        <!-- DASHBOARD VIEW -->
-        <section id="dashboard-view" class="view-section text-center">
-            <h1 class="text-3xl font-extrabold mb-2">Selamat Belajar!</h1>
-            <p class="text-slate-500 mb-10 text-sm">Pilih mata pelajaran untuk mengerjakan soal simulasi.</p>
+        <!-- ========================================== -->
+        <!-- 2. VIEW: DASHBOARD (Pilih Fitur)           -->
+        <!-- ========================================== -->
+        <section id="dashboard-view" class="view-section">
+            <div class="text-center mb-12">
+                <div class="inline-block bg-pink-100 text-brand-pink px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
+                    🌟 Dashboard Belajar
+                </div>
+                <h1 class="text-3xl md:text-4xl font-bold text-brand-dark mb-4">
+                    Mau belajar apa hari ini, <span id="dash-nama" class="text-gradient-brand">Siswa</span>?
+                </h1>
+                <p class="text-gray-600">Pilih menu di bawah ini untuk memulai petualangan belajarmu.</p>
+            </div>
+
+            <!-- GRID 3 KOLOM -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto items-center">
+                
+                <!-- KIRI: Bank Soal (Normal) -->
+                <div onclick="navigateTo('banksoal-view')" class="bg-white rounded-3xl shadow-sm hover:shadow-lg hover:-translate-y-2 transition-all overflow-hidden border border-gray-100 cursor-pointer group flex flex-col h-full min-h-[300px]">
+                    <div class="h-28 bg-orange-50 relative flex items-center justify-center transition-colors group-hover:bg-brand-orange">
+                        <i class="fas fa-layer-group text-5xl text-brand-orange opacity-50 absolute right-4 bottom-4 group-hover:text-white transition-colors"></i>
+                        <h3 class="text-xl font-bold text-brand-dark relative z-10 group-hover:text-white transition-colors">Bank Soal</h3>
+                    </div>
+                    <div class="p-6 flex-1 text-center flex flex-col justify-between">
+                        <p class="text-gray-500 text-sm mb-4">Latihan berbagai jenis soal dari tahun-tahun sebelumnya untuk mengasah pemahamanmu.</p>
+                        <span class="inline-flex items-center justify-center text-brand-orange font-semibold text-sm group-hover:translate-x-2 transition-transform">
+                            Buka Bank Soal <i class="fas fa-arrow-right ml-2"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- TENGAH: Try Out (Paling Gede) -->
+                <div onclick="navigateTo('to-list-view')" class="bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-3 transition-all overflow-hidden border-2 border-brand-pink cursor-pointer group flex flex-col transform md:scale-110 z-10 h-full min-h-[340px]">
+                    <div class="h-36 bg-pink-50 relative flex items-center justify-center transition-colors group-hover:bg-brand-pink">
+                        <i class="fas fa-file-signature text-7xl text-brand-pink opacity-20 absolute right-2 bottom-2 group-hover:text-white transition-colors"></i>
+                        <h3 class="text-3xl font-extrabold text-brand-dark relative z-10 group-hover:text-white transition-colors">Try Out</h3>
+                    </div>
+                    <div class="p-8 flex-1 text-center flex flex-col justify-between">
+                        <p class="text-gray-600 text-base mb-4 font-medium">Uji kemampuanmu dengan simulasi ujian terstruktur dan dapatkan analisis nilaimu secara detail.</p>
+                        <span class="inline-flex items-center justify-center text-brand-pink font-bold text-lg group-hover:translate-x-2 transition-transform">
+                            Mulai Kerjakan <i class="fas fa-arrow-right ml-2"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- KANAN: Games Edukasi (Normal) -->
+                <div onclick="navigateTo('games-view')" class="bg-white rounded-3xl shadow-sm hover:shadow-lg hover:-translate-y-2 transition-all overflow-hidden border border-gray-100 cursor-pointer group flex flex-col h-full min-h-[300px]">
+                    <div class="h-28 bg-yellow-50 relative flex items-center justify-center transition-colors group-hover:bg-brand-yellow">
+                        <i class="fas fa-gamepad text-5xl text-brand-yellow opacity-50 absolute right-4 bottom-4 group-hover:text-white transition-colors"></i>
+                        <h3 class="text-xl font-bold text-brand-dark relative z-10 group-hover:text-white transition-colors">Games Edukasi</h3>
+                    </div>
+                    <div class="p-6 flex-1 text-center flex flex-col justify-between">
+                        <p class="text-gray-500 text-sm mb-4">Belajar sambil bermain! Selesaikan tantangan dan kumpulkan poin belajarmu di sini.</p>
+                        <span class="inline-flex items-center justify-center text-brand-yellow font-semibold text-sm group-hover:translate-x-2 transition-transform">
+                            Mainkan Sekarang <i class="fas fa-arrow-right ml-2"></i>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 3. VIEW: PILIH TRY OUT 1-6                 -->
+        <!-- ========================================== -->
+        <section id="to-list-view" class="view-section text-center max-w-4xl mx-auto">
+            <button onclick="navigateTo('dashboard-view')" class="mb-6 font-semibold text-gray-400 hover:text-brand-pink flex items-center transition-colors text-sm">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
+            </button>
+            <h2 class="text-3xl font-extrabold mb-2">Pilih Sesi Try Out</h2>
+            <p class="text-slate-500 mb-10 text-sm">Pilih sesi ujian Try Out yang ingin kamu kerjakan.</p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <!-- Generate otomatis 1-6 via JS atau manual -->
+                <button onclick="selectTO(1)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                    <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 1</h3>
+                </button>
+                <button onclick="selectTO(2)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                    <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 2</h3>
+                </button>
+                <button onclick="selectTO(3)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                    <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 3</h3>
+                </button>
+                <button onclick="selectTO(4)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                    <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 4</h3>
+                </button>
+                <button onclick="selectTO(5)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                    <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 5</h3>
+                </button>
+                <button onclick="selectTO(6)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                    <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 6</h3>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 4. VIEW: PILIH MATA PELAJARAN              -->
+        <!-- ========================================== -->
+        <section id="subject-select-view" class="view-section text-center max-w-4xl mx-auto">
+            <button onclick="navigateTo('to-list-view')" class="mb-6 font-semibold text-gray-400 hover:text-brand-pink flex items-center transition-colors text-sm">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke List Try Out
+            </button>
+            <h2 class="text-3xl font-extrabold mb-2"><span id="selected-to-label" class="text-brand-pink">Try Out X</span></h2>
+            <p class="text-slate-500 mb-10 text-sm">Pilih mata pelajaran untuk sesi Try Out ini.</p>
+            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <button onclick="selectSubject('Matematika Wajib')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-pink hover:shadow-md transition-all group">
+                <button onclick="chooseSubject('Matematika Wajib')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-pink hover:shadow-md transition-all group">
                     <div class="w-16 h-16 bg-pink-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-pink transition-colors">
                         <i class="fas fa-calculator text-brand-pink text-2xl group-hover:text-white"></i>
                     </div>
                     <span class="font-bold text-xl block">Matematika</span>
                 </button>
-                <button onclick="selectSubject('Bahasa Indonesia')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-orange hover:shadow-md transition-all group">
+                <button onclick="chooseSubject('Bahasa Indonesia')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-orange hover:shadow-md transition-all group">
                     <div class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-orange transition-colors">
                         <i class="fas fa-book text-brand-orange text-2xl group-hover:text-white"></i>
                     </div>
                     <span class="font-bold text-xl block">B. Indonesia</span>
                 </button>
-                <button onclick="selectSubject('Bahasa Inggris')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-yellow hover:shadow-md transition-all group">
+                <button onclick="chooseSubject('Bahasa Inggris')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-yellow hover:shadow-md transition-all group">
                     <div class="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-yellow transition-colors">
                         <i class="fas fa-language text-brand-yellow text-2xl group-hover:text-white"></i>
                     </div>
@@ -138,17 +243,10 @@
             </div>
         </section>
 
-        <!-- TO SELECT VIEW -->
-        <section id="to-select-view" class="view-section">
-            <button onclick="navigateTo('dashboard-view')" class="mb-6 font-semibold text-gray-400 hover:text-brand-pink flex items-center transition-colors text-sm">
-                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
-            </button>
-            <h2 class="text-2xl font-bold mb-6">Pilih Sesi Try Out - <span id="selected-subject-label" class="text-brand-pink"></span></h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="to-buttons"></div>
-        </section>
-
-        <!-- EXAM VIEW -->
-        <section id="exam-view" class="view-section">
+        <!-- ========================================== -->
+        <!-- 5. VIEW: EXAM / UJIAN                      -->
+        <!-- ========================================== -->
+        <section id="exam-view" class="view-section max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-8 sticky top-24 z-40 bg-slate-50/90 backdrop-blur-sm py-3 border-b">
                 <h2 id="exam-title" class="text-xl font-bold text-brand-dark uppercase tracking-tight">Latihan</h2>
                 <div class="flex items-center gap-3">
@@ -169,8 +267,10 @@
             </div>
         </section>
 
-        <!-- RESULT VIEW -->
-        <section id="result-view" class="view-section">
+        <!-- ========================================== -->
+        <!-- 6. VIEW: HASIL & PEMBAHASAN                -->
+        <!-- ========================================== -->
+        <section id="result-view" class="view-section max-w-5xl mx-auto">
             <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-slate-100 max-w-4xl mx-auto mb-10 text-center">
                 <h2 class="text-2xl font-bold text-slate-400 mb-2 tracking-widest uppercase">Skor Akhir</h2>
                 <div class="text-8xl font-black text-brand-dark mb-10" id="final-score">0</div>
@@ -202,13 +302,53 @@
                 <div id="review-list" class="space-y-6"></div>
             </div>
         </section>
+
+        <!-- ========================================== -->
+        <!-- PLACEHOLDERS: BANK SOAL & GAMES            -->
+        <!-- ========================================== -->
+        <section id="banksoal-view" class="view-section max-w-5xl mx-auto">
+            <button onclick="navigateTo('dashboard-view')" class="mb-6 text-gray-500 hover:text-brand-orange font-semibold flex items-center transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
+            </button>
+            <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 min-h-[60vh]">
+                <div class="border-b border-gray-100 pb-4 mb-6 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-brand-dark"><i class="fas fa-layer-group text-brand-orange mr-2"></i> Bank Soal</h2>
+                </div>
+                <div class="border-2 border-dashed border-orange-200 bg-orange-50 rounded-2xl p-10 text-center flex flex-col items-center justify-center h-full">
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center text-brand-orange text-2xl mb-4">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">Segera Hadir!</h3>
+                    <p class="text-gray-500 text-sm max-w-md">Fitur Bank Soal masih dalam tahap pengembangan.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="games-view" class="view-section max-w-5xl mx-auto">
+            <button onclick="navigateTo('dashboard-view')" class="mb-6 text-gray-500 hover:text-brand-yellow font-semibold flex items-center transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
+            </button>
+            <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 min-h-[60vh]">
+                <div class="border-b border-gray-100 pb-4 mb-6 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-brand-dark"><i class="fas fa-gamepad text-brand-yellow mr-2"></i> Games Edukasi EXE</h2>
+                </div>
+                <div class="border-2 border-dashed border-yellow-200 bg-yellow-50 rounded-2xl p-10 text-center flex flex-col items-center justify-center h-full">
+                    <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center text-brand-yellow text-2xl mb-4">
+                        <i class="fas fa-puzzle-piece"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">Segera Hadir!</h3>
+                    <p class="text-gray-500 text-sm max-w-md">Fitur Games Edukasi interaktif akan segera tiba.</p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <script>
         // URL Database Soal
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxRc9WNbxdj8lMdJUyZzvW8rBghM0cF01wSMcjrb4NmnHF5CO9F-2oqoXcmXv8nzEYKg/exec";
         
-        // URL Database Siswa (Baru ditambahkan)
+        // URL Database Siswa
         const URL_SISWA = "https://script.google.com/macros/s/AKfycbxaHaTvlAiUUN0FE0deQh--AWuHAIsWdh68JylHpsTA9NftUE-9Ad-g81oTrN-h6RkT/exec"; 
         
         let dataSiswa = [];
@@ -225,7 +365,6 @@
 
         // --- FUNGSI LOGIN & DATABASE SISWA ---
 
-        // Menarik data siswa saat halaman dimuat
         async function loadDataSiswa() {
             document.getElementById('login-input-section').classList.add('hidden');
             document.getElementById('login-loading').classList.remove('hidden');
@@ -254,7 +393,6 @@
             }
         }
 
-        // Mengecek input nama dan menampilkan konfirmasi
         function checkSiswa() {
             const inputName = document.getElementById('input-nama').value;
             
@@ -263,8 +401,6 @@
             if (selectedSiswa) {
                 document.getElementById('login-input-section').classList.add('hidden');
                 
-                // Menyesuaikan dengan format key dari GSheets (Nama, Email, Asal_Sekolah, Kelas)
-                // Jika spasinya tidak pakai underscore di sheet, ganti Asal_Sekolah menjadi 'Asal Sekolah'
                 document.getElementById('confirm-nama').innerText = selectedSiswa.Nama || "-";
                 document.getElementById('confirm-email').innerText = selectedSiswa.Email || "-";
                 document.getElementById('confirm-sekolah').innerText = selectedSiswa.Asal_Sekolah || selectedSiswa['Asal Sekolah'] || "-";
@@ -274,11 +410,11 @@
             }
         }
 
-        // Memproses tombol Ya / Bukan pada konfirmasi
         function confirmLogin(isCorrect) {
             if (isCorrect && selectedSiswa) {
                 const namaDepan = selectedSiswa.Nama.split(' ')[0];
                 document.getElementById('display-nama').innerText = namaDepan;
+                document.getElementById('dash-nama').innerText = namaDepan; // Set nama di Dashboard
                 document.getElementById('nav-user-menu').classList.remove('hidden');
                 
                 navigateTo('dashboard-view');
@@ -305,7 +441,7 @@
         }
 
 
-        // --- FUNGSI UJIAN (Dari kode sebelumnya, dipertahankan seutuhnya) ---
+        // --- ALUR NAVIGASI & UJIAN BARU ---
 
         function triggerMath(element) {
             if (window.renderMathInElement) {
@@ -326,23 +462,21 @@
             document.getElementById('exam-footer').style.display = (viewId === 'exam-view') ? 'flex' : 'none';
         }
 
-        function selectSubject(subject) {
-            selectedSubject = subject;
-            document.getElementById('selected-subject-label').innerText = subject;
-            const btnContainer = document.getElementById('to-buttons');
-            btnContainer.innerHTML = "";
-            for (let i = 1; i <= 6; i++) {
-                const btn = document.createElement('button');
-                btn.onclick = function() { startExam(i); };
-                btn.className = "p-6 bg-white border border-slate-100 rounded-2xl hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all font-bold text-lg text-slate-700 shadow-sm";
-                btn.innerText = `Try Out ${i}`;
-                btnContainer.appendChild(btn);
-            }
-            navigateTo('to-select-view');
+        // Langkah 1: Pilih TO 1-6 dari Menu Try Out
+        function selectTO(toNo) {
+            selectedTO = toNo;
+            document.getElementById('selected-to-label').innerText = `Try Out ${selectedTO}`;
+            navigateTo('subject-select-view');
         }
 
-        async function startExam(toNo) {
-            selectedTO = toNo;
+        // Langkah 2: Pilih Mapel di dalam TO tersebut
+        function chooseSubject(subject) {
+            selectedSubject = subject;
+            startExam(); 
+        }
+
+        // Langkah 3: Tarik Soal dan Mulai
+        async function startExam() {
             userAnswers = {};
             document.getElementById('review-container').classList.add('hidden');
             navigateTo('exam-view');
@@ -368,7 +502,7 @@
                 
                 renderSoalList();
                 document.getElementById('btn-submit').classList.remove('hidden');
-                initTimer(60);
+                initTimer(60); // 60 Menit default
                 
             } catch (err) {
                 container.innerHTML = `<div class='p-12 text-center text-red-500 bg-red-50 rounded-3xl border border-red-200'><p class='font-bold'>Eror Koneksi Database!</p></div>`;
