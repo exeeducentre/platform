@@ -149,13 +149,14 @@
                 </div>
 
                 <!-- TENGAH: Try Out (Paling Gede) -->
-                <div onclick="navigateTo('to-list-view')" class="bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-3 transition-all overflow-hidden border-2 border-brand-pink cursor-pointer group flex flex-col transform md:scale-110 z-10 h-full min-h-[340px]">
+                <!-- PERUBAHAN: Sekarang Try Out mengarah ke pemilihan Kategori -->
+                <div onclick="openCategorySelect()" class="bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-3 transition-all overflow-hidden border-2 border-brand-pink cursor-pointer group flex flex-col transform md:scale-110 z-10 h-full min-h-[340px]">
                     <div class="h-36 bg-pink-50 relative flex items-center justify-center transition-colors group-hover:bg-brand-pink">
                         <i class="fas fa-file-signature text-7xl text-brand-pink opacity-20 absolute right-2 bottom-2 group-hover:text-white transition-colors"></i>
                         <h3 class="text-3xl font-extrabold text-brand-dark relative z-10 group-hover:text-white transition-colors">Try Out</h3>
                     </div>
                     <div class="p-8 flex-1 text-center flex flex-col justify-between">
-                        <p class="text-gray-600 text-base mb-4 font-medium">Uji kemampuanmu dengan simulasi ujian terstruktur dan dapatkan analisis nilaimu secara detail.</p>
+                        <p class="text-gray-600 text-base mb-4 font-medium">Uji kemampuanmu dengan simulasi ujian terstruktur untuk SNBT, TKA, PTS, maupun PAS.</p>
                         <span class="inline-flex items-center justify-center text-brand-pink font-bold text-lg group-hover:translate-x-2 transition-transform">
                             Mulai Kerjakan <i class="fas fa-arrow-right ml-2"></i>
                         </span>
@@ -180,71 +181,71 @@
         </section>
 
         <!-- ========================================== -->
-        <!-- 3. VIEW: PILIH TRY OUT 1-6                 -->
+        <!-- VIEW BARU: PILIH KATEGORI (SNBT, TKA, Dll) -->
         <!-- ========================================== -->
-        <section id="to-list-view" class="view-section text-center max-w-4xl mx-auto">
+        <section id="category-select-view" class="view-section text-center max-w-4xl mx-auto">
             <button onclick="navigateTo('dashboard-view')" class="mb-6 font-semibold text-gray-400 hover:text-brand-pink flex items-center transition-colors text-sm">
                 <i class="fas fa-arrow-left mr-2"></i> Kembali ke Dashboard
             </button>
+            <h2 class="text-3xl font-extrabold mb-2">Pilih Kategori Try Out</h2>
+            <p class="text-slate-500 mb-10 text-sm">Silakan pilih kategori ujian yang ingin kamu ikuti.</p>
+
+            <div id="category-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Dynamically populated based on student's class -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW BARU: PILIH MATA PELAJARAN DINAMIS    -->
+        <!-- ========================================== -->
+        <section id="subject-select-view" class="view-section text-center max-w-5xl mx-auto">
+            <button onclick="navigateTo('category-select-view')" class="mb-6 font-semibold text-gray-400 hover:text-brand-pink flex items-center transition-colors text-sm">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Kategori
+            </button>
+            <h2 class="text-3xl font-extrabold mb-2">Pilih Mata Pelajaran</h2>
+            <p class="text-slate-500 mb-10 text-sm">Kategori Pilihan: <span id="selected-category-label" class="font-bold text-brand-pink border-b-2 border-brand-pink pb-1"></span></p>
+            
+            <!-- Tempat daftar mapel dirender otomatis oleh JavaScript -->
+            <div id="subject-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- VIEW: PILIH TRY OUT 1-6                    -->
+        <!-- ========================================== -->
+        <section id="to-list-view" class="view-section text-center max-w-4xl mx-auto">
+            <button onclick="navigateTo('subject-select-view')" class="mb-6 font-semibold text-gray-400 hover:text-brand-pink flex items-center transition-colors text-sm">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Mata Pelajaran
+            </button>
             <h2 class="text-3xl font-extrabold mb-2">Pilih Sesi Try Out</h2>
-            <p class="text-slate-500 mb-10 text-sm">Pilih sesi ujian Try Out yang ingin kamu kerjakan.</p>
+            <p class="text-slate-500 mb-10 text-sm">Kamu memilih <span id="selected-to-label" class="font-bold text-brand-pink"></span></p>
             
             <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                <button onclick="selectTO(1)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                <!-- Tombol-tombol ini sekarang memanggil startCheckHistory() bukan selectTO() -->
+                <button onclick="startCheckHistory(1)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
                     <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 1</h3>
                 </button>
-                <button onclick="selectTO(2)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                <button onclick="startCheckHistory(2)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
                     <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 2</h3>
                 </button>
-                <button onclick="selectTO(3)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                <button onclick="startCheckHistory(3)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
                     <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 3</h3>
                 </button>
-                <button onclick="selectTO(4)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                <button onclick="startCheckHistory(4)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
                     <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 4</h3>
                 </button>
-                <button onclick="selectTO(5)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                <button onclick="startCheckHistory(5)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
                     <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 5</h3>
                 </button>
-                <button onclick="selectTO(6)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
+                <button onclick="startCheckHistory(6)" class="p-8 bg-white border border-slate-100 rounded-3xl shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group">
                     <h3 class="font-bold text-2xl text-slate-700 group-hover:text-brand-pink">Try Out 6</h3>
                 </button>
             </div>
         </section>
 
         <!-- ========================================== -->
-        <!-- 4. VIEW: PILIH MATA PELAJARAN              -->
-        <!-- ========================================== -->
-        <section id="subject-select-view" class="view-section text-center max-w-4xl mx-auto">
-            <button onclick="navigateTo('to-list-view')" class="mb-6 font-semibold text-gray-400 hover:text-brand-pink flex items-center transition-colors text-sm">
-                <i class="fas fa-arrow-left mr-2"></i> Kembali ke List Try Out
-            </button>
-            <h2 class="text-3xl font-extrabold mb-2"><span id="selected-to-label" class="text-brand-pink">Try Out X</span></h2>
-            <p class="text-slate-500 mb-10 text-sm">Pilih mata pelajaran untuk sesi Try Out ini.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <button onclick="chooseSubject('Matematika Wajib')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-pink hover:shadow-md transition-all group">
-                    <div class="w-16 h-16 bg-pink-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-pink transition-colors">
-                        <i class="fas fa-calculator text-brand-pink text-2xl group-hover:text-white"></i>
-                    </div>
-                    <span class="font-bold text-xl block">Matematika</span>
-                </button>
-                <button onclick="chooseSubject('Bahasa Indonesia')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-orange hover:shadow-md transition-all group">
-                    <div class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-orange transition-colors">
-                        <i class="fas fa-book text-brand-orange text-2xl group-hover:text-white"></i>
-                    </div>
-                    <span class="font-bold text-xl block">B. Indonesia</span>
-                </button>
-                <button onclick="chooseSubject('Bahasa Inggris')" class="p-8 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-brand-yellow hover:shadow-md transition-all group">
-                    <div class="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-brand-yellow transition-colors">
-                        <i class="fas fa-language text-brand-yellow text-2xl group-hover:text-white"></i>
-                    </div>
-                    <span class="font-bold text-xl block">B. Inggris</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- 5. VIEW: EXAM / UJIAN                      -->
+        <!-- VIEW: EXAM / UJIAN                         -->
         <!-- ========================================== -->
         <section id="exam-view" class="view-section max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-8 sticky top-24 z-40 bg-slate-50/90 backdrop-blur-sm py-3 border-b">
@@ -268,10 +269,9 @@
         </section>
 
         <!-- ========================================== -->
-        <!-- 6. VIEW: HASIL & PEMBAHASAN                -->
+        <!-- VIEW: HASIL & PEMBAHASAN                   -->
         <!-- ========================================== -->
         <section id="result-view" class="view-section max-w-5xl mx-auto">
-            <!-- Banner Riwayat -->
             <div id="history-banner" class="hidden bg-blue-50 border border-blue-200 text-blue-700 px-6 py-4 rounded-2xl mb-8 flex items-center justify-center gap-3">
                 <i class="fas fa-history text-xl"></i>
                 <span class="font-medium text-sm">Kamu sedang melihat riwayat pengerjaan Try Out ini. Data jawabanmu ditarik dari sistem.</span>
@@ -350,20 +350,24 @@
     </main>
 
     <script>
-        // URL Database Soal
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxRc9WNbxdj8lMdJUyZzvW8rBghM0cF01wSMcjrb4NmnHF5CO9F-2oqoXcmXv8nzEYKg/exec";
-        
-        // URL Database Siswa
-        const URL_SISWA = "https://script.google.com/macros/s/AKfycbxaHaTvlAiUUN0FE0deQh--AWuHAIsWdh68JylHpsTA9NftUE-9Ad-g81oTrN-h6RkT/exec"; 
+        // --- FUNGSI PARSER GAMBAR (TRIK 2) ---
+        function parseInlineImages(text) {
+            if (!text) return "";
+            return text.replace(/\[GAMBAR:\s*(https?:\/\/[^\s\]]+)\]/gi, '<br><img src="$1" class="max-w-md mx-auto my-4 rounded-xl border border-slate-200 shadow-sm"><br>');
+        }
 
-        // URL API Baru (Menangani GET Riwayat & POST Submit Nilai)
+        // URL Database
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyxRc9WNbxdj8lMdJUyZzvW8rBghM0cF01wSMcjrb4NmnHF5CO9F-2oqoXcmXv8nzEYKg/exec";
+        const URL_SISWA = "https://script.google.com/macros/s/AKfycbxaHaTvlAiUUN0FE0deQh--AWuHAIsWdh68JylHpsTA9NftUE-9Ad-g81oTrN-h6RkT/exec"; 
         const API_URL = "https://script.google.com/macros/s/AKfycbzigR4mLqt7LZkKSmPzDnAiqESRA9H1QnlX4zDxWss5w9HB-8g337mCT7VcxS3Om9sU/exec";
 
         let dataSiswa = [];
         let selectedSiswa = null;
-
         let allSoalData = [];
         let currentSoalFiltered = [];
+        
+        // Variabel Status Ujian
+        let selectedCategory = "";
         let selectedSubject = "";
         let selectedTO = 0;
         let userAnswers = {};
@@ -371,18 +375,80 @@
         let timerInterval;
         let targetTime;
 
+        // --- HELPER MENDAPATKAN LEVEL KELAS ---
+        function parseLevel(kStr) {
+            if (!kStr) return 0;
+            kStr = String(kStr).toUpperCase().replace(/KELAS/g, '').trim();
+            const firstWord = kStr.split(/\s+/)[0]; 
+            const romanMap = { 'I':1, 'II':2, 'III':3, 'IV':4, 'V':5, 'VI':6, 'VII':7, 'VIII':8, 'IX':9, 'X':10, 'XI':11, 'XII':12 };
+            
+            if (romanMap[firstWord]) return romanMap[firstWord];
+            const num = parseInt(firstWord);
+            if (!isNaN(num)) return num;
+            return 0;
+        }
+
+        function getStudentLevel() {
+            if (!selectedSiswa || !selectedSiswa.Kelas) return 0; // 0 = fallback (muncul semua)
+            if (selectedSiswa.Kelas === "Admin") return 999; // 999 = Mode Admin (Tembus semua batasan)
+            return parseLevel(selectedSiswa.Kelas);
+        }
+
+        // --- DATA KATEGORI DINAMIS ---
+        const CATEGORY_DATA = [
+            { id: 'SNBT', name: 'TO SNBT', icon: 'fa-university', hoverBorder: 'hover:border-brand-pink', bgIcon: 'bg-pink-100', hoverBgIcon: 'group-hover:bg-brand-pink', textIcon: 'text-brand-pink', hoverText: 'group-hover:text-brand-pink', allowed: [12] },
+            { id: 'TKA', name: 'TO TKA', icon: 'fa-atom', hoverBorder: 'hover:border-brand-orange', bgIcon: 'bg-orange-100', hoverBgIcon: 'group-hover:bg-brand-orange', textIcon: 'text-brand-orange', hoverText: 'group-hover:text-brand-orange', allowed: [6, 9, 12] },
+            { id: 'PTS', name: 'TO PTS', icon: 'fa-file-alt', hoverBorder: 'hover:border-brand-yellow', bgIcon: 'bg-yellow-100', hoverBgIcon: 'group-hover:bg-brand-yellow', textIcon: 'text-brand-yellow', hoverText: 'group-hover:text-brand-yellow', allowed: [4, 5, 6, 7, 8, 9, 10, 11, 12] },
+            { id: 'PAS', name: 'TO PAS', icon: 'fa-flag-checkered', hoverBorder: 'hover:border-blue-500', bgIcon: 'bg-blue-100', hoverBgIcon: 'group-hover:bg-blue-500', textIcon: 'text-blue-500', hoverText: 'group-hover:text-blue-500', allowed: [4, 5, 6, 7, 8, 9, 10, 11, 12] }
+        ];
+
+        // --- DATA STRUKTUR DAFTAR MAPEL PER KATEGORI ---
+        const SUBJECT_LIST = {
+            'SNBT': [
+                { name: 'Pengetahuan Kuantitatif', icon: 'fa-square-root-variable', color: '#d81b60', min: 12, max: 12 },
+                { name: 'Penalaran Matematika', icon: 'fa-chart-pie', color: '#f57c00', min: 12, max: 12 },
+                { name: 'Penalaran Umum', icon: 'fa-brain', color: '#fbc02d', min: 12, max: 12 },
+                { name: 'Pengetahuan Bacaan dan Menulis', icon: 'fa-book-open', color: '#3b82f6', min: 12, max: 12 },
+                { name: 'Pengetahuan dan Pemahaman Umum', icon: 'fa-lightbulb', color: '#a855f7', min: 12, max: 12 },
+                { name: 'Literasi Bahasa Indonesia', icon: 'fa-book', color: '#22c55e', min: 12, max: 12 },
+                { name: 'Literasi Bahasa Inggris', icon: 'fa-language', color: '#ef4444', min: 12, max: 12 }
+            ],
+            'TKA': [
+                { name: 'Matematika Wajib', icon: 'fa-calculator', color: '#d81b60', min: 10, max: 12 },
+                { name: 'Matematika Lanjut', icon: 'fa-square-root-variable', color: '#d81b60', min: 10, max: 12 },
+                { name: 'Bahasa Indonesia Wajib', icon: 'fa-book', color: '#f57c00', min: 10, max: 12 },
+                { name: 'Bahasa Indonesia Lanjut', icon: 'fa-book-open', color: '#f57c00', min: 10, max: 12 },
+                { name: 'Bahasa Inggris Wajib', icon: 'fa-language', color: '#fbc02d', min: 10, max: 12 },
+                { name: 'Bahasa Inggris Lanjut', icon: 'fa-comments', color: '#fbc02d', min: 10, max: 12 },
+                { name: 'Fisika', icon: 'fa-atom', color: '#3b82f6', min: 7, max: 12 },
+                { name: 'Kimia', icon: 'fa-flask', color: '#a855f7', min: 7, max: 12 },
+                { name: 'Biologi', icon: 'fa-leaf', color: '#22c55e', min: 7, max: 12 }
+            ],
+            'PTS': [
+                { name: 'Matematika Wajib', icon: 'fa-calculator', color: '#d81b60', min: 10, max: 12 },
+                { name: 'Matematika Lanjut', icon: 'fa-square-root-variable', color: '#d81b60', min: 10, max: 12 },
+                { name: 'Bahasa Indonesia Wajib', icon: 'fa-book', color: '#f57c00', min: 10, max: 12 },
+                { name: 'Bahasa Indonesia Lanjut', icon: 'fa-book-open', color: '#f57c00', min: 10, max: 12 },
+                { name: 'Bahasa Inggris Wajib', icon: 'fa-language', color: '#fbc02d', min: 10, max: 12 },
+                { name: 'Bahasa Inggris Lanjut', icon: 'fa-comments', color: '#fbc02d', min: 10, max: 12 },
+                { name: 'Fisika', icon: 'fa-atom', color: '#3b82f6', min: 7, max: 12 },
+                { name: 'Kimia', icon: 'fa-flask', color: '#a855f7', min: 7, max: 12 },
+                { name: 'Biologi', icon: 'fa-leaf', color: '#22c55e', min: 7, max: 12 },
+                { name: 'Matematika', icon: 'fa-calculator', color: '#ef4444', min: 4, max: 9 },
+                { name: 'IPAS', icon: 'fa-earth-asia', color: '#14b8a6', min: 4, max: 6 }
+            ]
+        };
+        SUBJECT_LIST['PAS'] = SUBJECT_LIST['PTS'];
+
         // --- FUNGSI LOGIN & DATABASE SISWA ---
         async function loadDataSiswa() {
             document.getElementById('login-input-section').classList.add('hidden');
             document.getElementById('login-loading').classList.remove('hidden');
-            
             try {
                 const response = await fetch(URL_SISWA);
                 dataSiswa = await response.json();
-                
                 const dataList = document.getElementById('siswa-list');
                 dataList.innerHTML = "";
-                
                 dataSiswa.forEach(s => {
                     if(s.Nama) {
                         const option = document.createElement('option');
@@ -390,7 +456,6 @@
                         dataList.appendChild(option);
                     }
                 });
-                
             } catch (err) {
                 console.error("Gagal menarik data siswa", err);
                 alert("Gagal memuat database siswa. Coba muat ulang halaman.");
@@ -403,16 +468,24 @@
         function checkSiswa() {
             const inputName = document.getElementById('input-nama').value;
             
-            selectedSiswa = dataSiswa.find(s => String(s.Nama).trim() === String(inputName).trim());
+            // JALUR KHUSUS ADMIN
+            if (inputName === "Fore Coffee") {
+                selectedSiswa = { 
+                    Nama: "Admin (Fore Coffee)", 
+                    Email: "-", 
+                    Asal_Sekolah: "Pusat EXE", 
+                    Kelas: "Admin" 
+                };
+            } else {
+                selectedSiswa = dataSiswa.find(s => String(s.Nama).trim() === String(inputName).trim());
+            }
             
             if (selectedSiswa) {
                 document.getElementById('login-input-section').classList.add('hidden');
-                
                 document.getElementById('confirm-nama').innerText = selectedSiswa.Nama || "-";
                 document.getElementById('confirm-email').innerText = selectedSiswa.Email || "-";
                 document.getElementById('confirm-sekolah').innerText = selectedSiswa.Asal_Sekolah || selectedSiswa['Asal Sekolah'] || "-";
                 document.getElementById('confirm-kelas').innerText = selectedSiswa.Kelas || "-";
-                
                 document.getElementById('login-confirm-section').classList.remove('hidden');
             }
         }
@@ -423,9 +496,7 @@
                 document.getElementById('display-nama').innerText = namaDepan;
                 document.getElementById('dash-nama').innerText = namaDepan;
                 document.getElementById('nav-user-menu').classList.remove('hidden');
-                
                 navigateTo('dashboard-view');
-                
                 document.getElementById('login-confirm-section').classList.add('hidden');
                 document.getElementById('login-input-section').classList.remove('hidden');
                 document.getElementById('input-nama').value = "";
@@ -445,7 +516,6 @@
             navigateTo('auth-view');
         }
 
-        // --- ALUR NAVIGASI & UJIAN BARU ---
         function triggerMath(element) {
             if (window.renderMathInElement) {
                 renderMathInElement(element || document.body, {
@@ -465,25 +535,82 @@
             document.getElementById('exam-footer').style.display = (viewId === 'exam-view') ? 'flex' : 'none';
         }
 
-        function selectTO(toNo) {
-            selectedTO = toNo;
-            document.getElementById('selected-to-label').innerText = `Try Out ${selectedTO}`;
+        // --- ALUR BARU: KATEGORI -> MAPEL -> TO -> UJIAN ---
+
+        // Membuka menu Kategori dan merender sesuai Kelas Siswa (Atau bypass jika Admin)
+        function openCategorySelect() {
+            const level = getStudentLevel();
+            const grid = document.getElementById('category-grid');
+            grid.innerHTML = '';
+            
+            CATEGORY_DATA.forEach(cat => {
+                // Munculkan jika kelas sesuai, atau level 0, atau jika Mode Admin (999)
+                if (cat.allowed.includes(level) || level === 0 || level === 999) {
+                    const btn = document.createElement('button');
+                    btn.onclick = () => selectCategory(cat.id);
+                    btn.className = `p-8 bg-white border border-slate-100 rounded-3xl shadow-sm ${cat.hoverBorder} hover:shadow-md transition-all group text-left flex items-center gap-6`;
+                    btn.innerHTML = `
+                        <div class="w-16 h-16 ${cat.bgIcon} rounded-2xl flex items-center justify-center shrink-0 ${cat.hoverBgIcon} transition-colors">
+                            <i class="fas ${cat.icon} ${cat.textIcon} text-2xl group-hover:text-white transition-colors"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xl text-slate-700 ${cat.hoverText} transition-colors">${cat.name}</h3>
+                        </div>
+                    `;
+                    grid.appendChild(btn);
+                }
+            });
+            
+            navigateTo('category-select-view');
+        }
+
+        // Langkah 1: Pengguna memilih kategori
+        function selectCategory(catName) {
+            selectedCategory = catName;
+            document.getElementById('selected-category-label').innerText = catName;
+            
+            const grid = document.getElementById('subject-grid');
+            grid.innerHTML = ""; 
+
+            const level = getStudentLevel();
+            const subjects = SUBJECT_LIST[catName] || [];
+            
+            // Render mata pelajaran dinamis berdasarkan Kategori & Kelas
+            subjects.forEach(sub => {
+                let isAllowed = true;
+                // Jika siswa biasa (bukan fallback 0 dan bukan Admin 999), filter mapelnya
+                if (level !== 0 && level !== 999) {
+                    if (sub.min && level < sub.min) isAllowed = false;
+                    if (sub.max && level > sub.max) isAllowed = false;
+                }
+
+                if (isAllowed) {
+                    const card = document.createElement('button');
+                    card.onclick = () => selectSubject(sub.name);
+                    card.className = "p-5 bg-white rounded-3xl shadow-sm border border-slate-100 hover:shadow-lg hover:-translate-y-1 transition-all group flex flex-col items-center justify-center text-center h-full";
+                    card.innerHTML = `
+                        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors bg-slate-50 border border-slate-100" style="color: ${sub.color};" onmouseover="this.style.backgroundColor='${sub.color}'; this.style.color='#fff'; this.style.borderColor='${sub.color}';" onmouseout="this.style.backgroundColor='#f8fafc'; this.style.color='${sub.color}'; this.style.borderColor='#f1f5f9';">
+                            <i class="fas ${sub.icon} text-2xl"></i>
+                        </div>
+                        <span class="font-bold text-xs md:text-sm text-slate-700 leading-tight flex-grow">${sub.name}</span>
+                    `;
+                    grid.appendChild(card);
+                }
+            });
+
             navigateTo('subject-select-view');
         }
 
-        // HELPER: Untuk fetch soal dari database
-        async function fetchAndFilterSoal() {
-            if (allSoalData.length === 0) {
-                const response = await fetch(SCRIPT_URL);
-                const json = await response.json();
-                allSoalData = Array.isArray(json) ? json : [];
-            }
-            currentSoalFiltered = allSoalData.filter((s) => String(s.Mapel).trim() === selectedSubject && Number(s.TO_Ke) === selectedTO);
+        // Langkah 2: Pengguna memilih Mata Pelajaran
+        function selectSubject(subName) {
+            selectedSubject = subName;
+            document.getElementById('selected-to-label').innerText = `${selectedCategory} - ${subName}`;
+            navigateTo('to-list-view');
         }
 
-        // --- FUNGSI BARU: MENGAMBIL RIWAYAT SEBELUM UJIAN ---
-        async function chooseSubject(subject) {
-            selectedSubject = subject;
+        // Langkah 3: Pengguna memilih Nomor TO, Cek History, lalu Render
+        async function startCheckHistory(toNo) {
+            selectedTO = toNo;
             
             document.getElementById('exam-title').innerText = "Mengecek Riwayat...";
             document.getElementById('review-container').classList.add('hidden');
@@ -496,27 +623,55 @@
 
             try {
                 const nama = selectedSiswa ? selectedSiswa.Nama : "Anonim";
-                const checkUrl = `${API_URL}?nama=${encodeURIComponent(nama)}&mapel=${encodeURIComponent(selectedSubject)}&to_ke=${selectedTO}`;
+                const checkUrl = `${API_URL}?nama=${encodeURIComponent(nama)}&kategori=${encodeURIComponent(selectedCategory)}&mapel=${encodeURIComponent(selectedSubject)}&to_ke=${selectedTO}`;
                 
-                // Fetch riwayat ke App Script
                 const response = await fetch(checkUrl);
                 const result = await response.json();
                 
                 if (result.status === "found") {
-                    // JIKA UDAH NGERJAIN -> Tarik soal dan langsung buat halaman review
                     await fetchAndFilterSoal(); 
                     userAnswers = result.jawaban_user || {}; 
-                    
-                    // Eksekusi logic perhitungan tanpa submit ke API lagi
                     processExamResult(true, result.skor); 
                 } else {
-                    // JIKA BELUM NGERJAIN -> Mulai ujian normal
                     startExam(); 
                 }
             } catch (err) {
                 console.error("Gagal ngecek riwayat", err);
-                startExam(); // Fallback kalau error, biarkan ujian normal
+                startExam(); 
             }
+        }
+
+        // --- FILTER SOAL ---
+        async function fetchAndFilterSoal() {
+            if (allSoalData.length === 0) {
+                const response = await fetch(SCRIPT_URL);
+                const json = await response.json();
+                allSoalData = Array.isArray(json) ? json : [];
+            }
+            
+            const level = getStudentLevel();
+
+            currentSoalFiltered = allSoalData.filter((s) => {
+                // 1. Cek Kategori, Mapel, TO
+                const sheetCat = s.Kategori ? String(s.Kategori).trim().toUpperCase() : "";
+                const isCatMatch = sheetCat ? (sheetCat === selectedCategory.toUpperCase()) : true; 
+                const isMapelMatch = String(s.Mapel).trim() === selectedSubject;
+                const isTOMatch = Number(s.TO_Ke) === selectedTO;
+                
+                // 2. Cek Kelas Identifer di Soal
+                let isClassMatch = true;
+                // Kalau admin (999), biarkan admin melihat semua soal (skip filter kelas). 
+                // Kalau siswa biasa, soal harus sesuai level kelas siswa.
+                if (level !== 999) {
+                    const qLevel = parseLevel(s.Kelas);
+                    // Filter diberlakukan jika admin mengisi kolom kelas di bank soal
+                    if (s.Kelas && String(s.Kelas).trim() !== "" && String(s.Kelas).trim() !== "-") {
+                        isClassMatch = (qLevel === level);
+                    }
+                }
+                
+                return isCatMatch && isMapelMatch && isTOMatch && isClassMatch;
+            });
         }
 
         async function startExam() {
@@ -530,7 +685,7 @@
                 await fetchAndFilterSoal();
 
                 if (currentSoalFiltered.length === 0) {
-                    container.innerHTML = `<div class='p-12 text-center text-gray-500 bg-white rounded-3xl border border-dashed border-slate-300'><p class='font-bold text-lg'>Soal Belum Tersedia!</p></div>`;
+                    container.innerHTML = `<div class='p-12 text-center text-gray-500 bg-white rounded-3xl border border-dashed border-slate-300'><p class='font-bold text-lg mb-2'>Soal Belum Tersedia!</p><p class='text-sm'>Admin belum memasukkan soal untuk Kategori <span class="font-bold text-brand-pink">${selectedCategory}</span>, Mapel <span class="font-bold text-brand-pink">${selectedSubject}</span>, TO <span class="font-bold text-brand-pink">${selectedTO}</span>.</p></div>`;
                     return;
                 }
                 
@@ -567,9 +722,11 @@
                 const card = document.createElement('div');
                 card.className = "bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-100 soal-card relative overflow-hidden";
                 
-                let stimulusHtml = soal.Stimulus;
-                if (String(stimulusHtml).includes('http')) {  
-                    stimulusHtml = `<img src="${stimulusHtml}" alt="Stimulus">`;  
+                let stimulusHtml = soal.Stimulus ? String(soal.Stimulus) : "";
+                if (stimulusHtml.includes('[GAMBAR:')) {
+                    stimulusHtml = parseInlineImages(stimulusHtml);
+                } else if (stimulusHtml.trim().startsWith('http')) {  
+                    stimulusHtml = `<img src="${stimulusHtml.trim()}" alt="Stimulus">`;  
                 }
 
                 let middleContent = "";
@@ -671,10 +828,10 @@
                 }
 
                 let topPertanyaan = "";
-                let bottomPertanyaan = `<div class="text-xl font-bold mb-8 text-brand-dark leading-snug">${soal.Pertanyaan}</div>`;
+                let bottomPertanyaan = `<div class="text-xl font-bold mb-8 text-brand-dark leading-snug">${parseInlineImages(soal.Pertanyaan)}</div>`;
                 
                 if (type === 3) {
-                    topPertanyaan = `<div class="text-xl font-bold mb-2 text-brand-dark leading-snug">${soal.Pertanyaan}</div>`;
+                    topPertanyaan = `<div class="text-xl font-bold mb-2 text-brand-dark leading-snug">${parseInlineImages(soal.Pertanyaan)}</div>`;
                     bottomPertanyaan = "";
                 }
 
@@ -707,26 +864,20 @@
             userAnswers[no][rowNo] = val;
         }
 
-        // --- SUBMIT UJIAN (Dipanggil kalau baru pertama kali ngerjain) ---
         async function submitExam() {
             clearInterval(timerInterval);
-
             const btnSubmit = document.getElementById('btn-submit');
             if (btnSubmit) {
                 btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim Jawaban...';
                 btnSubmit.disabled = true;
             }
-
-            // Panggil proses evaluasi (isHistoryMode = false)
             await processExamResult(false);
-            
             if (btnSubmit) {
                 btnSubmit.innerHTML = 'Selesai & Kumpulkan Jawaban';
                 btnSubmit.disabled = false;
             }
         }
 
-        // --- FUNGSI INTI: EVALUASI & RENDER HASIL (Dipakai di submit maupun review) ---
         async function processExamResult(isHistoryMode = false, historyScore = null) {
             let correct = 0;
             let topicAnalysis = {};
@@ -740,7 +891,6 @@
                 let userValDisp = "";
                 let kunciValDisp = String(s.Kunci).trim().toUpperCase();
                 
-                // === Evaluasi Kebenaran ===
                 if (type === 3) {
                     const ansObj = userAnswers[no] || {};
                     const benerRows = String(s.Kunci).split(",").map((x) => x.trim());
@@ -762,12 +912,13 @@
                 topicAnalysis[topic].total++;
                 if (isCorrect) topicAnalysis[topic].correct++;
 
-                let stimulusHtmlReview = s.Stimulus;
-                if (String(stimulusHtmlReview).includes('http')) {  
-                    stimulusHtmlReview = `<img src="${stimulusHtmlReview}" alt="Stimulus" class="max-w-full h-auto rounded-xl mb-4 border border-slate-200">`; 
+                let stimulusHtmlReview = s.Stimulus ? String(s.Stimulus) : "";
+                if (stimulusHtmlReview.includes('[GAMBAR:')) {
+                    stimulusHtmlReview = parseInlineImages(stimulusHtmlReview);
+                } else if (stimulusHtmlReview.trim().startsWith('http')) {  
+                    stimulusHtmlReview = `<img src="${stimulusHtmlReview.trim()}" alt="Stimulus" class="max-w-full h-auto rounded-xl mb-4 border border-slate-200">`; 
                 }
 
-                // === Bangun Blok Opsi Jawaban untuk Pembahasan ===
                 let optionsReviewBlock = `<div class="mt-4 mb-6 space-y-2">`;
                 
                 if (type === 3) {
@@ -792,10 +943,8 @@
                                         const isKunciB = benerRows.includes(String(i+1));
                                         const isKunciS = !isKunciB;
                                         const userAns = ansObj[i+1];
-                                        
                                         const iconB = isKunciB ? '<i class="fas fa-check-circle text-green-500 text-xl"></i>' : (userAns === 'B' ? '<i class="fas fa-times-circle text-red-500 text-xl"></i>' : '-');
                                         const iconS = isKunciS ? '<i class="fas fa-check-circle text-green-500 text-xl"></i>' : (userAns === 'S' ? '<i class="fas fa-times-circle text-red-500 text-xl"></i>' : '-');
-                                        
                                         return `
                                         <tr>
                                             <td class="p-4 border-r bg-white">${stmt}</td>
@@ -861,7 +1010,6 @@
                     choices.forEach(c => {
                         const isKunci = kunciArray.includes(c.l);
                         const isUser = userArray.includes(c.l);
-                        
                         let bgClass = "bg-white border-slate-100";
                         let textClass = "text-gray-700";
                         let iconHtml = `<div class="w-6 h-6 rounded-full border-2 border-slate-200 shrink-0 flex items-center justify-center font-bold text-[10px] text-slate-400">${c.l}</div>`;
@@ -883,7 +1031,6 @@
                         </div>`;
                     });
                     
-                    // Box Keterangan Kunci Jawaban
                     optionsReviewBlock += `
                         <div class="mt-4 p-4 rounded-xl ${isCorrect ? 'bg-green-100 border border-green-200' : 'bg-red-100 border border-red-200'}">
                             <div class="flex flex-col md:flex-row md:gap-6 gap-2 text-sm">
@@ -895,7 +1042,6 @@
                 }
                 optionsReviewBlock += `</div>`;
 
-                // === Render Review Card ===
                 const reviewCard = document.createElement('div');
                 reviewCard.className = `bg-white p-6 md:p-8 rounded-3xl shadow-sm border ${isCorrect ? 'is-correct' : 'is-wrong'}`;
                 reviewCard.innerHTML = `
@@ -909,26 +1055,22 @@
                         </span>
                     </div>
                     <div class="mb-4 text-slate-600 leading-relaxed text-sm">${stimulusHtmlReview}</div>
-                    <div class="text-slate-800 font-bold text-lg mb-4">${s.Pertanyaan}</div>
-                    
+                    <div class="text-slate-800 font-bold text-lg mb-4">${parseInlineImages(s.Pertanyaan)}</div>
                     ${optionsReviewBlock}
-
                     <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-sm leading-relaxed">
                         <p class="text-xs font-bold text-brand-pink uppercase mb-3"><i class="fas fa-lightbulb mr-1"></i> Pembahasan</p>
-                        ${s.Pembahasan || 'Pembahasan belum tersedia.'}
+                        ${parseInlineImages(s.Pembahasan || 'Pembahasan belum tersedia.')}
                     </div>
                 `;
                 reviewList.appendChild(reviewCard);
             });
 
-            // HITUNG SKOR FINAL (Ambil dari History kalau ada, kalau tidak kalkulasi baru)
             const finalScore = (isHistoryMode && historyScore !== null) 
                                 ? historyScore 
                                 : Math.round((correct / currentSoalFiltered.length) * 100);
             
             document.getElementById('final-score').innerText = finalScore;
             
-            // SIAPKAN DATA UNTUK UI & PAYLOAD APP SCRIPT
             const analysisBody = document.getElementById('analysis-body');
             analysisBody.innerHTML = "";
             let analisisTeks = ""; 
@@ -936,7 +1078,6 @@
             for (const t in topicAnalysis) {
                 const acc = Math.round((topicAnalysis[t].correct / topicAnalysis[t].total) * 100);
                 analisisTeks += `${t}: ${topicAnalysis[t].correct}/${topicAnalysis[t].total} (${acc}%), `;
-
                 analysisBody.innerHTML += `
                     <tr>
                         <td class="p-4 font-bold text-slate-600 uppercase text-[10px]">${t}</td>
@@ -948,39 +1089,35 @@
                     </tr>`;
             }
 
-            // === KIRIM PAYLOAD KE GOOGLE APPS SCRIPT (HANYA JIKA BUKAN MODE RIWAYAT) ===
             if (!isHistoryMode) {
                 const payloadData = {
                     nama: selectedSiswa ? selectedSiswa.Nama : "Anonim",
                     kelas: selectedSiswa ? (selectedSiswa.Kelas || "-") : "-",
                     sekolah: selectedSiswa ? (selectedSiswa.Asal_Sekolah || selectedSiswa['Asal Sekolah'] || "-") : "-",
                     mapel: selectedSubject,
+                    kategori: selectedCategory, // Disertakan siapa tahu Apps Script membutuhkannya nanti
                     to_ke: selectedTO,
                     skor: finalScore,
                     analisis: analisisTeks,
-                    jawaban_user: userAnswers // <--- JAWABAN SEKARANG DISIMPAN!
+                    jawaban_user: userAnswers
                 };
-
                 try {
                     await fetch(API_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                         body: JSON.stringify(payloadData)
                     });
-                    console.log("Sukses simpan ke Database!");
                 } catch (error) {
                     console.error("Gagal simpan ke database:", error);
                 }
             }
 
-            // Tampilkan atau sembunyikan banner history
             if (isHistoryMode) {
                 document.getElementById('history-banner').classList.remove('hidden');
             } else {
                 document.getElementById('history-banner').classList.add('hidden');
             }
 
-            // LANJUT KE HALAMAN RESULT
             navigateTo('result-view');
             triggerMath(reviewList);
         }
@@ -991,10 +1128,9 @@
             if (!container.classList.contains('hidden')) container.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Panggil saat halaman pertama kali termuat
         document.addEventListener("DOMContentLoaded", function() {
             triggerMath();
-            loadDataSiswa(); // Mengambil data siswa
+            loadDataSiswa(); 
         });
     </script>
 </body>
