@@ -135,7 +135,7 @@
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 ml-1 mt-4">Password</label>
                         <input type="password" id="input-password" placeholder="Masukkan Password" class="w-full px-5 py-3 md:py-4 rounded-xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-brand-pink focus:bg-white transition-all font-medium text-sm md:text-base">
                         <div class="text-right mt-2">
-                            <button onclick="lupaPassword()" class="text-xs text-brand-pink hover:underline font-semibold">Lupa Password?</button>
+                            <button id="btn-forgot-password" onclick="lupaPassword()" class="text-xs text-brand-pink hover:underline font-semibold">Lupa Password?</button>
                         </div>
                     </div>
                     <button id="btn-proses-login" onclick="prosesLogin()" class="w-full bg-gradient-brand text-white font-bold py-3.5 md:py-4 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all mt-6 text-base md:text-lg">Masuk Dashboard</button>
@@ -258,7 +258,7 @@
         </section>
 
         <!-- ============================================== -->
-        <!-- ENGINE UJIAN (Universal TO & BS)               -->
+        <!-- ENGINE UJIAN (Universal TO & BS & KUIS)        -->
         <!-- ============================================== -->
         <section id="exam-view" class="view-section max-w-5xl mx-auto">
             <div class="flex justify-between items-center mb-6 md:mb-8 sticky top-20 z-40 bg-slate-50/90 backdrop-blur-sm py-3 md:py-4 border-b border-slate-200">
@@ -304,13 +304,13 @@
     </main>
 
     <script>
-        // --- KONFIGURASI API ---
-        const API_URL = "https://script.google.com/macros/s/AKfycbxtCLSMS2OiZxt325uKhBa_6f_WdpLsP_n-m3serwBC9MUgi6542LCnLm6LExPBDmjV/exec";
+        // --- KONFIGURASI API (URL Baru v4.0) ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbxYnlr3JrLjQU72wo-klDdI4z-qWusFrZLW8N6Fb3IIkzDgMXQrjNueO6Ik0z1rwSt-/exec";
 
         const $ = id => document.getElementById(id);
         
         let currentUser = null;
-        let examMode = ""; // "TO" atau "BS"
+        let examMode = ""; // "TO", "BS", atau "KUIS"
         let currentMenuTree = {};
         
         // State Ujian
@@ -325,6 +325,19 @@
             'Pengetahuan Kuantitatif': 'fa-square-root-variable', 'Literasi': 'fa-book-open',
             'Fisika': 'fa-rocket'
         };
+
+        // ==============================================
+        // INISIALISASI SESI (LOCALSTORAGE)
+        // ==============================================
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedSession = localStorage.getItem('exe_current_user');
+            if(savedSession) {
+                try {
+                    currentUser = JSON.parse(savedSession);
+                    setupDashboard(); // Lewati login, langsung ke dashboard
+                } catch(e) { localStorage.removeItem('exe_current_user'); }
+            }
+        });
 
         // ==============================================
         // GLOBAL MODAL & LUPA PASSWORD
@@ -343,29 +356,48 @@
             setTimeout(() => $('global-modal').classList.add('hidden'), 200);
         }
 
-        function lupaPassword() {
+        async function lupaPassword() {
             const email = $('input-email').value.trim();
             if (!email) {
                 showModal("Lupa Password?", "Silakan ketik Email kamu di kolom isian terlebih dahulu, lalu klik tombol 'Lupa Password' lagi.", "<i class='fas fa-question-circle text-brand-orange'></i>");
                 return;
             }
-            showModal("Permintaan Reset Password", `Jika email terdaftar, tautan untuk mengatur ulang password akan dikirimkan ke: \n\n${email}\n\nSilakan cek kotak masuk atau folder spam kamu setelah ini.`, "<i class='fas fa-envelope-open-text text-brand-pink'></i>");
+            
+            const btn = $('btn-forgot-password');
+            const oldText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+            btn.style.pointerEvents = 'none';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "forgot_password", email: email })
+                });
+                const result = await response.json();
+
+                if(result.status === "success") {
+                    showModal("Berhasil!", result.message, "<i class='fas fa-envelope-open-text text-green-500'></i>");
+                } else {
+                    showModal("Gagal Ditemukan", result.message, "<i class='fas fa-exclamation-triangle text-red-500'></i>");
+                }
+            } catch(e) {
+                showModal("Error", "Gagal menghubungi peladen. Periksa koneksi internet Anda.", "<i class='fas fa-wifi text-red-500'></i>");
+            } finally {
+                btn.innerHTML = oldText;
+                btn.style.pointerEvents = 'auto';
+            }
         }
 
         // ==============================================
         // GANTI PASSWORD MODAL LOGIC
         // ==============================================
         function openPasswordModal() {
-            $('old-password').value = "";
-            $('new-password').value = "";
-            $('confirm-password').value = "";
+            $('old-password').value = ""; $('new-password').value = ""; $('confirm-password').value = "";
             $('password-feedback').classList.add('hidden');
             $('password-modal').classList.remove('hidden');
         }
 
-        function closePasswordModal() {
-            $('password-modal').classList.add('hidden');
-        }
+        function closePasswordModal() { $('password-modal').classList.add('hidden'); }
 
         async function prosesGantiPassword() {
             const oldPass = $('old-password').value;
@@ -395,17 +427,20 @@
 
             try {
                 const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: "change_password", email: currentUser.Email, old_password: oldPass, new_password: newPass })
                 });
-                
                 const result = await response.json();
 
                 if (result.status === "success") {
                     feedback.innerText = result.message;
                     feedback.className = "text-sm text-center font-bold mb-4 text-green-600";
                     feedback.classList.remove('hidden');
+                    
+                    // Update current user password cache in local storage
+                    currentUser.Password = newPass; 
+                    localStorage.setItem('exe_current_user', JSON.stringify(currentUser));
+
                     setTimeout(() => { 
                         closePasswordModal(); 
                         showModal("Berhasil!", "Password Anda berhasil diperbarui.", "<i class='fas fa-check-circle text-green-500'></i>"); 
@@ -425,7 +460,7 @@
         }
 
         // ==============================================
-        // UTILITIES & FORMATTING
+        // FORMATTING UTILITIES
         // ==============================================
         function parseInlineImages(text) {
             if (!text) return "";
@@ -453,6 +488,39 @@
         }
         function hideLoading() { $('global-loading').classList.add('hidden'); }
 
+        // Formatting Tanggal ke Bahasa Indonesia
+        function formatTanggalIndonesia(dateStr) {
+            try {
+                const date = new Date(dateStr);
+                if (isNaN(date.getTime())) return dateStr;
+                const days = ['Ahad', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+            } catch(e) { return dateStr; }
+        }
+
+        // Helper untuk ngecek apakah kelas sudah selesai
+        function isClassOver(tglStr, waktuSelesaiStr) {
+            if (!tglStr || tglStr === "-") return false;
+            try {
+                const classDate = new Date(tglStr);
+                if(isNaN(classDate.getTime())) return false;
+                
+                if (waktuSelesaiStr && waktuSelesaiStr !== "-") {
+                    // Coba deteksi format "21:00" atau "21:00 WIB"
+                    const timeMatch = String(waktuSelesaiStr).match(/(\d{1,2}):(\d{2})/);
+                    if (timeMatch) {
+                        classDate.setHours(parseInt(timeMatch[1]), parseInt(timeMatch[2]), 0);
+                    } else {
+                        classDate.setHours(23, 59, 59); // Fallback ke ujung hari
+                    }
+                } else {
+                    classDate.setHours(23, 59, 59);
+                }
+                return new Date() > classDate; // return true jika waktu sekarang lebih besar
+            } catch(e) { return false; }
+        }
+
         // ==============================================
         // AUTHENTICATION
         // ==============================================
@@ -472,21 +540,18 @@
 
             try {
                 const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: "login", email: email, password: password })
                 });
                 const result = await response.json();
 
                 if(result.status === "success") {
                     currentUser = result.data.user;
-                    const namaDepan = currentUser.Nama.split(' ')[0];
-                    $('display-nama').innerText = namaDepan; $('dash-nama').innerText = namaDepan;
-                    $('main-nav').classList.remove('hidden');
+                    localStorage.setItem('exe_current_user', JSON.stringify(currentUser)); // Simpan Sesi
                     
                     feedback.classList.add('hidden');
                     $('input-password').value = "";
-                    navigateTo('dashboard-view');
+                    setupDashboard();
                 } else {
                     feedback.innerText = result.message || "Email atau password salah.";
                     feedback.className = "text-sm text-center font-bold mb-4 text-red-500";
@@ -501,8 +566,17 @@
             }
         }
 
+        function setupDashboard() {
+            const namaDepan = currentUser.Nama.split(' ')[0];
+            $('display-nama').innerText = namaDepan; $('dash-nama').innerText = namaDepan;
+            $('main-nav').classList.remove('hidden');
+            navigateTo('dashboard-view');
+        }
+
         function doLogout() {
-            currentUser = null; $('main-nav').classList.add('hidden');
+            currentUser = null; 
+            localStorage.removeItem('exe_current_user'); // Hapus sesi
+            $('main-nav').classList.add('hidden');
             $('input-email').value = ""; $('input-password').value = "";
             navigateTo('auth-view');
         }
@@ -511,17 +585,21 @@
         // JADWAL KELAS ENGINE
         // ==============================================
         async function initJadwal() {
-            showLoading("Memuat Jadwal", "Mengambil data kelas dari sistem...");
+            // Blokir akses untuk EXE-cutive Silver
+            if (currentUser.Paket && String(currentUser.Paket).toUpperCase().includes("SILVER")) {
+                showModal("Akses Terbatas", "Maaf, akun Anda terdaftar pada paket EXE-cutive Silver yang tidak memiliki akses ke fitur Jadwal Kelas Interaktif.\n\nFokuslah pada latihan mandiri di Bank Soal dan Try Out!", "<i class='fas fa-lock text-brand-pink'></i>");
+                return;
+            }
+
+            showLoading("Memuat Jadwal", "Mengambil sinkronisasi jadwal kelas...");
             try {
                 let res = await fetch(API_URL, {
                     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: "get_jadwal", kelas: currentUser.Kelas })
                 });
                 let data = await res.json();
-                
                 renderJadwal(data.data || []);
             } catch(e) { 
-                // Jika error atau endpoint get_jadwal belum ditambahkan ke Backend baru, tampilkan kosong
                 renderJadwal([]); 
             } finally { hideLoading(); }
         }
@@ -536,19 +614,75 @@
                         <p class="text-xs md:text-sm">Tidak ada jadwal kelas interaktif yang tersedia untukmu saat ini.</p>
                     </div>`;
             } else {
-                container.innerHTML = jadwalData.map(j => `
-                    <div class="bg-white p-5 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 md:w-14 md:h-14 bg-blue-50 text-brand-blue rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl shrink-0"><i class="fas fa-clock"></i></div>
+                container.innerHTML = jadwalData.map(j => {
+                    const isOver = isClassOver(j.Tanggal, j.Waktu_Selesai);
+                    const tglRapi = formatTanggalIndonesia(j.Tanggal);
+                    const mapel = j.Mata_Pelajaran || 'Sesi Kelas';
+                    const guru = j.Nama_Guru || 'Tentor EXE';
+                    
+                    // Periksa Pre/Post Test
+                    let preTestBtn = (j.Kode_PreTest && j.Kode_PreTest !== "-") ? `<button onclick="executeQuizByKode('${j.Kode_PreTest}', 'Pre-Test ${mapel}')" class="px-3 py-1.5 bg-brand-orange text-white text-xs rounded-lg font-bold shadow-sm hover:scale-105 transition">Pre-Test</button>` : '';
+                    let postTestBtn = (j.Kode_PostTest && j.Kode_PostTest !== "-") ? `<button onclick="executeQuizByKode('${j.Kode_PostTest}', 'Post-Test ${mapel}')" class="px-3 py-1.5 bg-brand-pink text-white text-xs rounded-lg font-bold shadow-sm hover:scale-105 transition">Post-Test</button>` : '';
+                    
+                    // Render Tombol Live / Rekaman
+                    let primaryAction = "";
+                    if (isOver) {
+                        primaryAction = (j.Link_Rekaman && j.Link_Rekaman !== "-") ? `<a href="${j.Link_Rekaman}" target="_blank" class="w-full md:w-auto px-6 py-3 bg-slate-700 text-white rounded-xl text-sm font-bold hover:bg-slate-900 text-center transition-colors shadow-lg"><i class="fas fa-play-circle mr-2"></i>Tonton Rekaman</a>` : `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">Kelas Selesai (Rekaman OTW)</span>`;
+                    } else {
+                        primaryAction = (j.Link_Kelas && j.Link_Kelas !== "-") ? `<a href="${j.Link_Kelas}" target="_blank" class="w-full md:w-auto px-6 py-3 bg-brand-blue text-white rounded-xl text-sm font-bold hover:bg-blue-700 text-center transition-colors shadow-lg"><i class="fas fa-video mr-2"></i>Gabung Live</a>` : `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">Link Segera Hadir</span>`;
+                    }
+
+                    return `
+                    <div class="bg-white p-5 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border ${isOver ? 'border-slate-200 opacity-90' : 'border-brand-blue/30'} flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all hover:shadow-md">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 md:w-14 md:h-14 ${isOver ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-brand-blue'} rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl shrink-0"><i class="fas fa-chalkboard-teacher"></i></div>
                             <div>
-                                <h4 class="font-bold text-base md:text-lg text-slate-700">${j.Mata_Pelajaran || 'Sesi Kelas'}</h4>
-                                <p class="text-xs md:text-sm text-slate-500">${j.Hari || '-'}, Pukul ${j.Waktu || '-'}</p>
+                                <div class="flex flex-wrap gap-2 mb-1">
+                                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">${guru}</span>
+                                    ${isOver ? '<span class="text-[10px] font-bold uppercase tracking-wider text-red-500 bg-red-50 px-2 py-0.5 rounded">Selesai</span>' : '<span class="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded animate-pulse">Live / Akan Datang</span>'}
+                                </div>
+                                <h4 class="font-bold text-base md:text-lg text-slate-800">${mapel}</h4>
+                                <p class="text-xs md:text-sm text-slate-500 mt-1"><i class="far fa-calendar-alt mr-1"></i> ${tglRapi} • <i class="far fa-clock ml-1 mr-1"></i> ${j.Waktu_Mulai||'-'} s/d ${j.Waktu_Selesai||'-'}</p>
                             </div>
                         </div>
-                        ${j.Link ? `<a href="${j.Link}" target="_blank" class="w-full md:w-auto px-6 py-3 bg-brand-blue text-white rounded-xl text-sm font-bold hover:bg-blue-700 text-center transition-colors">Gabung Kelas</a>` : `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">Link Belum Tersedia</span>`}
-                    </div>`).join("");
+                        <div class="flex flex-col items-end gap-2 shrink-0">
+                            ${primaryAction}
+                            <div class="flex gap-2 w-full md:w-auto justify-end mt-1">${preTestBtn}${postTestBtn}</div>
+                        </div>
+                    </div>`;
+                }).join("");
             }
             navigateTo('jadwal-view');
+        }
+
+        // ==============================================
+        // QUIZ PRE/POST TEST ENGINE (KODE SET)
+        // ==============================================
+        async function executeQuizByKode(kode_set, judulKuis) {
+            examMode = "BS"; // Kuis otomatis disamakan skemanya dengan Bank Soal
+            state.mapel = "Kuis Sesi Kelas";
+            state.topik = judulKuis;
+            state.subtopik = kode_set;
+            state.lvl = "UJI PEMAHAMAN";
+            
+            showLoading("Mencari Soal", `Menyiapkan ${judulKuis}...`);
+            try {
+                let res = await fetch(API_URL, {
+                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "get_quiz_by_kode", kode_set: kode_set })
+                });
+                let qData = await res.json();
+                
+                if(qData.status === "found") {
+                    activeQuestions = qData.data;
+                    $('exam-title').innerText = judulKuis;
+                    userAnswers = {};
+                    state.qty = activeQuestions.length;
+                    renderExamUI(); // Timer akan dikalkulasi di dalam renderExamUI
+                } else {
+                    showModal("Kuis Tidak Ditemukan", "Soal untuk kuis ini belum dimasukkan atau kode set-nya salah. Silakan hubungi admin.", "<i class='fas fa-box-open text-brand-orange'></i>");
+                }
+            } catch(e) { alert("Gagal memuat kuis."); } finally { hideLoading(); }
         }
 
         // ==============================================
@@ -630,7 +764,7 @@
                         processResult(true, riwayat.data.skor); // Masuk mode hasil
                     } else {
                         userAnswers = {};
-                        renderExamUI(); // Masuk mode pengerjaan
+                        renderExamUI(); // Masuk mode pengerjaan (Timer otomatis membaca Durasi_Menit dari JSON)
                     }
                 } else {
                     renderEmptyExam("Belum ada soal Try Out yang disusun untuk sesi ini.");
@@ -694,7 +828,6 @@
             
             const levels = currentMenuTree[state.mapel][state.topik][subtopik] || [];
             
-            // Render Level Buttons
             $('bs-level-container').innerHTML = levels.map(l => {
                 let colorClass = "border-slate-200 text-slate-500 hover:border-slate-400";
                 if(l.toUpperCase() === 'MUDAH') colorClass = "border-green-200 text-green-600 hover:bg-green-50";
@@ -770,7 +903,6 @@
                 stim = stim.includes('[GAMBAR:') ? parseInlineImages(stim) : (stim.trim().startsWith('http') ? `<img src="${stim.trim()}" class="max-w-full h-auto rounded-xl border">` : stim);
                 
                 let optHTML = "";
-                // Render logika Opsi 1-5 persis sesuai referensi
                 if (type === 3) {
                     const stmts = [s.Opsi_A, s.Opsi_B, s.Opsi_C].filter(x => x && x !== "-");
                     optHTML = `<div class="my-4 md:my-6 overflow-x-auto rounded-xl border border-slate-200"><table class="w-full text-xs md:text-sm text-left min-w-[300px]"><thead class="bg-slate-800 text-white font-bold text-[10px] uppercase"><tr><th class="p-3">Pernyataan Analisis</th><th class="p-3 text-center w-20 md:w-24">${s.Opsi_D||"Benar"}</th><th class="p-3 text-center w-20 md:w-24">${s.Opsi_E||"Salah"}</th></tr></thead><tbody class="divide-y divide-slate-100">` + stmts.map((st, i) => `<tr><td class="p-3 md:p-4 border-r bg-slate-50/30">${st}</td><td class="p-3 md:p-4 text-center"><input type="radio" name="q${no}_row${i+1}" value="B" onchange="saveTableAns(${no}, ${i+1}, 'B')" class="w-4 h-4 md:w-5 md:h-5 accent-green-600"></td><td class="p-3 md:p-4 text-center"><input type="radio" name="q${no}_row${i+1}" value="S" onchange="saveTableAns(${no}, ${i+1}, 'S')" class="w-4 h-4 md:w-5 md:h-5 accent-red-600"></td></tr>`).join("") + `</tbody></table></div>`;
@@ -790,11 +922,20 @@
             });
             
             triggerMath(container);
-            initTimer(60); // 60 Menit
+            
+            // Logika Penentuan Timer
+            let durasi = 60;
+            if (examMode === "BS") {
+                durasi = Number(state.qty) * 2; // Bank Soal: 2 Menit x Jumlah Soal
+            } else if (examMode === "TO") {
+                // Try Out: Mengambil langsung nilai Durasi_Menit dari DB (baris soal pertama)
+                durasi = Number(activeQuestions[0].Durasi_Menit) || 60;
+            }
+            initTimer(durasi);
+            
             navigateTo('exam-view');
         }
 
-        // Jawaban Cache
         function saveSingleAns(no, val) { userAnswers[no] = val; }
         function saveMultiAns(no) { userAnswers[no] = Array.from(document.querySelectorAll(`input[name="q${no}"]:checked`)).map(c => c.value).sort().join(","); }
         function saveTableAns(no, rowNo, val) { if (!userAnswers[no]) userAnswers[no] = {}; userAnswers[no][rowNo] = val; }
@@ -837,7 +978,7 @@
                 
                 if (isCorrect) correct++;
                 
-                // Render Simple Review Box (Responsive padding & text)
+                // Render Simple Review Box
                 reviewList.innerHTML += `<div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border ${isCorrect?'border-green-400 bg-green-50/20':'border-red-400 bg-red-50/20'}"><div class="flex justify-between items-center mb-3"><span class="font-bold text-sm md:text-base">No. ${no}</span><span class="font-bold text-xs md:text-sm px-2 py-1 rounded-md ${isCorrect?'text-green-600 bg-green-100':'text-red-600 bg-red-100'}">${isCorrect?'<i class="fas fa-check mr-1"></i> Benar':'<i class="fas fa-times mr-1"></i> Salah'}</span></div><div class="text-xs md:text-sm space-y-1"><p>Jawabanmu: <b>${JSON.stringify(userAnswers[no]||"Kosong")}</b></p><p>Kunci: <b>${s.Kunci}</b></p></div><div class="mt-4 p-3 md:p-4 bg-slate-50 text-[11px] md:text-xs rounded-xl border overflow-x-auto"><b class="text-brand-pink block mb-1">Pembahasan:</b> ${parseInlineImages(s.Pembahasan||"Belum tersedia")}</div></div>`;
             });
 
@@ -846,12 +987,13 @@
             $('history-banner').classList[isHistoryMode ? 'remove' : 'add']('hidden');
 
             if (!isHistoryMode) {
-                // Post to DB
+                // Konversi examMode "KUIS" menjadi "BS" agar tetap masuk log Riwayat Bank Soal dengan mulus
+                const savingMode = (examMode === "TO") ? "TO" : "BS"; 
                 try {
                     await fetch(API_URL, { 
                         method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
                         body: JSON.stringify({ 
-                            action: "submit_result", type: examMode,
+                            action: "submit_result", type: savingMode,
                             nama: currentUser.Nama, kelas: currentUser.Kelas, sekolah: currentUser.Asal_Sekolah||"-",
                             kategori: state.kat, mapel: state.mapel, to_ke: state.to_ke, 
                             topik: state.topik, subtopik: state.subtopik, level: state.lvl,
@@ -861,7 +1003,7 @@
                 } catch (e) { console.error(e); }
             }
 
-            $('exam-footer').style.display = 'none'; // Sembunyikan footer ujian
+            $('exam-footer').style.display = 'none';
             triggerMath(reviewList);
             navigateTo('result-view');
         }
