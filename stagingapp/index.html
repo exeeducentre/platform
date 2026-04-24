@@ -530,47 +530,44 @@
             } catch(e) { return dateStr; }
         }
 
-        // PEMBERSIH JAM ANEH DARI GOOGLE SHEETS
+        // PEMBERSIH JAM ANEH DARI GOOGLE SHEETS (Tetap Ada Untuk Teks Display)
         function formatWaktuBersih(timeStr) {
             if (!timeStr || timeStr === "-") return "-";
-            // Cek apakah output dari backend berupa ISO String seperti 1899-12-30T10:52:48.000Z
             if (String(timeStr).includes("T") && String(timeStr).includes("Z")) {
                 try {
                     const d = new Date(timeStr);
-                    // Gunakan toLocaleTimeString untuk mengubahnya kembali ke zona waktu lokal secara otomatis (WIB)
                     return d.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' });
                 } catch(e) { return timeStr; }
             }
-            // Jika diketik manual oleh admin sebagai string biasa di sheet (Format: Teks Biasa)
             return timeStr; 
         }
 
-        // HELPER LOGIKA KELAS SELESAI
-        function isClassOver(tglStr, jamSelesaiBersih) {
-            if (!tglStr || tglStr === "-") return false;
+        // HELPER 3 STATUS KELAS CERDAS (Akan Datang / Sedang Live / Selesai)
+        function getClassStatus(tglStr, jamMulaiStr, jamSelesaiStr) {
+            if (!tglStr || tglStr === "-") return "UNKNOWN";
             try {
-                const classDate = new Date(tglStr);
-                if(isNaN(classDate.getTime())) return false;
-                
-                if (jamSelesaiBersih && jamSelesaiBersih !== "-") {
-                    const timeMatch = String(jamSelesaiBersih).match(/(\d{1,2}):(\d{2})/);
-                    if (timeMatch) {
-                        // Pastikan menyetel jam pakai waktu lokal pengguna / sesuai perbandingan
-                        classDate.setHours(parseInt(timeMatch[1]), parseInt(timeMatch[2]), 0);
-                    } else {
-                        classDate.setHours(23, 59, 59); 
-                    }
-                } else {
-                    classDate.setHours(23, 59, 59);
-                }
-                
-                // Gunakan jam pengguna disimulasikan ke WIB untuk perbandingan paling adil
                 const now = new Date();
                 const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const wibNow = new Date(utc + (3600000 * 7));
-                
-                return wibNow.getTime() > classDate.getTime();
-            } catch(e) { return false; }
+                const wibNow = new Date(utc + (3600000 * 7)); // Waktu saat ini di WIB
+
+                // Parse Start Time
+                let startDate = new Date(tglStr);
+                const matchMulai = String(jamMulaiStr).match(/(\d{1,2}):(\d{2})/);
+                if (matchMulai) startDate.setHours(parseInt(matchMulai[1]), parseInt(matchMulai[2]), 0);
+                else startDate.setHours(0, 0, 0);
+
+                // Parse End Time
+                let endDate = new Date(tglStr);
+                const matchSelesai = String(jamSelesaiStr).match(/(\d{1,2}):(\d{2})/);
+                if (matchSelesai) endDate.setHours(parseInt(matchSelesai[1]), parseInt(matchSelesai[2]), 0);
+                else endDate.setHours(23, 59, 59);
+
+                if (wibNow < startDate) return "UPCOMING";
+                if (wibNow >= startDate && wibNow <= endDate) return "ONGOING";
+                if (wibNow > endDate) return "FINISHED";
+
+            } catch(e) { return "UNKNOWN"; }
+            return "UNKNOWN";
         }
 
         // ==============================================
@@ -637,17 +634,12 @@
         // JADWAL KELAS ENGINE
         // ==============================================
         async function initJadwal() {
-            // Blokir akses untuk EXE-cutive Silver
-            if (currentUser.Paket && String(currentUser.Paket).toUpperCase().includes("SILVER")) {
-                showModal("Akses Terbatas", "Maaf, akun Anda terdaftar pada paket EXE-cutive Silver yang tidak memiliki akses ke fitur Jadwal Kelas Interaktif.\n\nFokuslah pada latihan mandiri di Bank Soal dan Try Out!", "<i class='fas fa-lock text-brand-pink'></i>");
-                return;
-            }
-
             showLoading("Memuat Jadwal", "Mengambil sinkronisasi jadwal kelas...");
             try {
+                // Sekarang mengirimkan parameter KELAS dan PAKET untuk disaring oleh Backend
                 let res = await fetch(API_URL, {
                     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: "get_jadwal", kelas: currentUser.Kelas })
+                    body: JSON.stringify({ action: "get_jadwal", kelas: currentUser.Kelas, paket: currentUser.Paket })
                 });
                 let data = await res.json();
                 renderJadwal(data.data || []);
@@ -665,14 +657,14 @@
                     <div class="p-8 md:p-12 text-center text-gray-500 bg-white rounded-3xl border border-slate-200 max-w-2xl mx-auto mt-6 shadow-sm">
                         <i class="fas fa-calendar-times text-5xl md:text-6xl mb-4 text-slate-300"></i>
                         <h3 class="font-bold text-lg md:text-xl text-slate-700 mb-2">Belum Ada Jadwal</h3>
-                        <p class="text-xs md:text-sm">Tidak ada jadwal kelas interaktif yang tersedia untukmu saat ini.</p>
+                        <p class="text-xs md:text-sm">Tidak ada jadwal kelas interaktif yang tersedia untuk paket/kelasmu saat ini.</p>
                     </div>`;
             } else {
                 container.innerHTML = jadwalData.map(j => {
                     const jamMulai = formatWaktuBersih(j.Waktu_Mulai);
                     const jamSelesai = formatWaktuBersih(j.Waktu_Selesai);
                     
-                    const isOver = isClassOver(j.Tanggal, jamSelesai);
+                    const statusKelas = getClassStatus(j.Tanggal, jamMulai, jamSelesai);
                     const tglRapi = formatTanggalIndonesia(j.Tanggal);
                     
                     const mapel = j.Mata_Pelajaran || 'Sesi Kelas';
@@ -682,22 +674,32 @@
                     let preTestBtn = (j.Kode_PreTest && j.Kode_PreTest !== "-") ? `<button onclick="executeQuizByKode('${j.Kode_PreTest}', 'Pre-Test ${mapel}')" class="px-3 py-1.5 bg-brand-orange text-white text-xs rounded-lg font-bold shadow-sm hover:scale-105 transition">Pre-Test</button>` : '';
                     let postTestBtn = (j.Kode_PostTest && j.Kode_PostTest !== "-") ? `<button onclick="executeQuizByKode('${j.Kode_PostTest}', 'Post-Test ${mapel}')" class="px-3 py-1.5 bg-brand-pink text-white text-xs rounded-lg font-bold shadow-sm hover:scale-105 transition">Post-Test</button>` : '';
                     
-                    // Render Tombol Live / Rekaman
+                    // Render Tombol & Label 3 Status
                     let primaryAction = "";
-                    if (isOver) {
+                    let badgeStatus = "";
+                    
+                    if (statusKelas === "UPCOMING") {
+                        badgeStatus = '<span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Akan Datang</span>';
+                        primaryAction = `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left"><i class="fas fa-clock mr-1"></i>Belum Mulai</span>`;
+                    } else if (statusKelas === "ONGOING") {
+                        badgeStatus = '<span class="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded animate-pulse">Sedang Live</span>';
+                        primaryAction = (j.Link_Kelas && j.Link_Kelas !== "-") ? `<a href="${j.Link_Kelas}" target="_blank" class="w-full md:w-auto px-6 py-3 bg-brand-blue text-white rounded-xl text-sm font-bold hover:bg-blue-700 text-center transition-colors shadow-lg"><i class="fas fa-video mr-2"></i>Gabung Live</a>` : `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">Link Segera Hadir</span>`;
+                    } else if (statusKelas === "FINISHED") {
+                        badgeStatus = '<span class="text-[10px] font-bold uppercase tracking-wider text-red-500 bg-red-50 px-2 py-0.5 rounded">Selesai</span>';
                         primaryAction = (j.Link_Rekaman && j.Link_Rekaman !== "-") ? `<a href="${j.Link_Rekaman}" target="_blank" class="w-full md:w-auto px-6 py-3 bg-slate-700 text-white rounded-xl text-sm font-bold hover:bg-slate-900 text-center transition-colors shadow-lg"><i class="fas fa-play-circle mr-2"></i>Tonton Rekaman</a>` : `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">Kelas Selesai (Rekaman OTW)</span>`;
                     } else {
-                        primaryAction = (j.Link_Kelas && j.Link_Kelas !== "-") ? `<a href="${j.Link_Kelas}" target="_blank" class="w-full md:w-auto px-6 py-3 bg-brand-blue text-white rounded-xl text-sm font-bold hover:bg-blue-700 text-center transition-colors shadow-lg"><i class="fas fa-video mr-2"></i>Gabung Live</a>` : `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">Link Segera Hadir</span>`;
+                        badgeStatus = '<span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Sesi Kelas</span>';
+                        primaryAction = `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">...</span>`;
                     }
 
                     return `
-                    <div class="bg-white p-5 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border ${isOver ? 'border-slate-200 opacity-90' : 'border-brand-blue/30'} flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all hover:shadow-md">
+                    <div class="bg-white p-5 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border ${statusKelas === 'FINISHED' ? 'border-slate-200 opacity-90' : 'border-brand-blue/30'} flex flex-col md:flex-row md:items-center justify-between gap-5 transition-all hover:shadow-md">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 md:w-14 md:h-14 ${isOver ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-brand-blue'} rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl shrink-0"><i class="fas fa-chalkboard-teacher"></i></div>
+                            <div class="w-12 h-12 md:w-14 md:h-14 ${statusKelas === 'FINISHED' ? 'bg-slate-100 text-slate-400' : 'bg-blue-50 text-brand-blue'} rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl shrink-0"><i class="fas fa-chalkboard-teacher"></i></div>
                             <div>
                                 <div class="flex flex-wrap gap-2 mb-1">
                                     <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">${guru}</span>
-                                    ${isOver ? '<span class="text-[10px] font-bold uppercase tracking-wider text-red-500 bg-red-50 px-2 py-0.5 rounded">Selesai</span>' : '<span class="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded animate-pulse">Live / Akan Datang</span>'}
+                                    ${badgeStatus}
                                 </div>
                                 <h4 class="font-bold text-base md:text-lg text-slate-800">${mapel}</h4>
                                 <p class="text-xs md:text-sm text-slate-500 mt-1"><i class="far fa-calendar-alt mr-1"></i> ${tglRapi} <span class="mx-1">•</span> <i class="far fa-clock mr-1"></i> <b class="text-brand-pink">${jamMulai} s/d ${jamSelesai} WIB</b></p>
