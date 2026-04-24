@@ -537,14 +537,11 @@
             if (String(timeStr).includes("T") && String(timeStr).includes("Z")) {
                 try {
                     const d = new Date(timeStr);
-                    // Ambil jam UTC nya, lalu tambah 7 untuk mendapatkan WIB
-                    const utcHours = d.getUTCHours();
-                    const utcMinutes = d.getUTCMinutes();
-                    let wibHours = (utcHours + 7) % 24;
-                    return `${String(wibHours).padStart(2, '0')}:${String(utcMinutes).padStart(2, '0')}`;
+                    // Gunakan toLocaleTimeString untuk mengubahnya kembali ke zona waktu lokal secara otomatis (WIB)
+                    return d.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' });
                 } catch(e) { return timeStr; }
             }
-            // Jika diketik manual oleh admin sebagai string biasa di sheet "18:00"
+            // Jika diketik manual oleh admin sebagai string biasa di sheet (Format: Teks Biasa)
             return timeStr; 
         }
 
