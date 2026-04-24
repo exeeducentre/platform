@@ -319,6 +319,11 @@
 
         const $ = id => document.getElementById(id);
         
+        // ==============================================
+        // SECURITY DASAR (Menonaktifkan Klik Kanan)
+        // ==============================================
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
         let currentUser = null;
         let examMode = ""; // "TO", "BS", atau "KUIS"
         let currentMenuTree = {};
