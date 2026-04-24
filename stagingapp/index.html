@@ -315,7 +315,7 @@
 
     <script>
         // --- KONFIGURASI API (URL Baru v4.0) ---
-        const API_URL = "https://script.google.com/macros/s/AKfycbxYnlr3JrLjQU72wo-klDdI4z-qWusFrZLW8N6Fb3IIkzDgMXQrjNueO6Ik0z1rwSt-/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbzRBrW5MAlqrv0eCTroeyer7WqH--a8tL_1SCLHsW9LQ0CyRzb-mcFDQjzq8tEQNnJb/exec";
 
         const $ = id => document.getElementById(id);
         
@@ -550,15 +550,15 @@
                 const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
                 const wibNow = new Date(utc + (3600000 * 7)); // Waktu saat ini di WIB
 
-                // Parse Start Time
+                // Parse Start Time (Mendukung titik dan titik dua spt 18.00 atau 18:00)
                 let startDate = new Date(tglStr);
-                const matchMulai = String(jamMulaiStr).match(/(\d{1,2}):(\d{2})/);
+                const matchMulai = String(jamMulaiStr).match(/(\d{1,2})[:.](\d{2})/);
                 if (matchMulai) startDate.setHours(parseInt(matchMulai[1]), parseInt(matchMulai[2]), 0);
                 else startDate.setHours(0, 0, 0);
 
-                // Parse End Time
+                // Parse End Time (Mendukung titik dan titik dua spt 19.30 atau 19:30)
                 let endDate = new Date(tglStr);
-                const matchSelesai = String(jamSelesaiStr).match(/(\d{1,2}):(\d{2})/);
+                const matchSelesai = String(jamSelesaiStr).match(/(\d{1,2})[:.](\d{2})/);
                 if (matchSelesai) endDate.setHours(parseInt(matchSelesai[1]), parseInt(matchSelesai[2]), 0);
                 else endDate.setHours(23, 59, 59);
 
@@ -634,6 +634,12 @@
         // JADWAL KELAS ENGINE
         // ==============================================
         async function initJadwal() {
+            // Blokir akses untuk EXE-cutive Silver
+            if (currentUser.Paket && String(currentUser.Paket).toUpperCase().includes("SILVER")) {
+                showModal("Akses Terbatas", "Maaf, akun Anda terdaftar pada paket EXE-cutive Silver yang tidak memiliki akses ke fitur Jadwal Kelas Interaktif.\n\nFokuslah pada latihan mandiri di Bank Soal dan Try Out!", "<i class='fas fa-lock text-brand-pink'></i>");
+                return;
+            }
+
             showLoading("Memuat Jadwal", "Mengambil sinkronisasi jadwal kelas...");
             try {
                 // Sekarang mengirimkan parameter KELAS dan PAKET untuk disaring oleh Backend
