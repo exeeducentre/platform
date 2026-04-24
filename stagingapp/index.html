@@ -314,8 +314,8 @@
     </main>
 
     <script>
-        // --- KONFIGURASI API (URL Baru v4.0) ---
-        const API_URL = "https://script.google.com/macros/s/AKfycbzRBrW5MAlqrv0eCTroeyer7WqH--a8tL_1SCLHsW9LQ0CyRzb-mcFDQjzq8tEQNnJb/exec";
+        // --- KONFIGURASI API (URL Baru v4.2 - UPDATE DEPLOYMENT ID) ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbzOFMW35eZtt1ToZA12r6h7NwVQYtjoNXz-1EOXd5NT4E7s53AS6P7VbhuH3LQuuX6S/exec";
 
         const $ = id => document.getElementById(id);
         
@@ -642,10 +642,15 @@
 
             showLoading("Memuat Jadwal", "Mengambil sinkronisasi jadwal kelas...");
             try {
-                // Sekarang mengirimkan parameter KELAS dan PAKET untuk disaring oleh Backend
+                // Sekarang mengirimkan parameter KELAS, PAKET, dan EMAIL untuk disaring oleh Backend
                 let res = await fetch(API_URL, {
                     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: "get_jadwal", kelas: currentUser.Kelas, paket: currentUser.Paket })
+                    body: JSON.stringify({ 
+                        action: "get_jadwal", 
+                        kelas: currentUser.Kelas, 
+                        paket: currentUser.Paket,
+                        email: currentUser.Email // <-- Penambahan kunci untuk Private Filtering
+                    })
                 });
                 let data = await res.json();
                 renderJadwal(data.data || []);
