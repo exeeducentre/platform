@@ -197,10 +197,20 @@
         <!-- JADWAL KELAS VIEW                              -->
         <!-- ============================================== -->
         <section id="jadwal-view" class="view-section max-w-5xl mx-auto">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 w-full">
                 <div>
                     <button onclick="navigateTo('dashboard-view')" class="mb-4 font-bold text-gray-400 hover:text-brand-blue flex items-center transition-colors text-sm"><i class="fas fa-arrow-left mr-2"></i> Kembali</button>
                     <h2 class="text-2xl md:text-3xl font-bold text-brand-dark tracking-tight">Jadwal Kelasmu</h2>
+                </div>
+                <!-- Jam WIB Realtime -->
+                <div class="bg-white px-4 py-2.5 md:px-5 md:py-3 rounded-xl shadow-sm border border-slate-200 flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                    <div class="flex items-center gap-3">
+                        <i class="far fa-clock text-brand-blue text-xl md:text-2xl"></i>
+                        <div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Jam (WIB)</div>
+                            <div id="realtime-clock" class="text-lg md:text-xl font-mono font-bold text-slate-700 leading-none">--:--:--</div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -460,7 +470,7 @@
         }
 
         // ==============================================
-        // FORMATTING UTILITIES
+        // FORMATTING UTILITIES & JAM REALTIME
         // ==============================================
         function parseInlineImages(text) {
             if (!text) return "";
@@ -488,7 +498,28 @@
         }
         function hideLoading() { $('global-loading').classList.add('hidden'); }
 
-        // Formatting Tanggal ke Bahasa Indonesia
+        // JAM REAL-TIME (WIB)
+        let clockInterval;
+        function startRealtimeClock() {
+            if (clockInterval) clearInterval(clockInterval);
+            const updateClock = () => {
+                const now = new Date();
+                // Mengkonversi ke waktu WIB (UTC + 7) dengan pasti
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                const wibDate = new Date(utc + (3600000 * 7));
+                
+                const h = String(wibDate.getHours()).padStart(2, '0');
+                const m = String(wibDate.getMinutes()).padStart(2, '0');
+                const s = String(wibDate.getSeconds()).padStart(2, '0');
+                
+                const clockEl = $('realtime-clock');
+                if (clockEl) clockEl.innerText = `${h}:${m}:${s}`;
+            };
+            updateClock();
+            clockInterval = setInterval(updateClock, 1000);
+        }
+
+        // FORMAT TANGGAL
         function formatTanggalIndonesia(dateStr) {
             try {
                 const date = new Date(dateStr);
@@ -499,25 +530,49 @@
             } catch(e) { return dateStr; }
         }
 
-        // Helper untuk ngecek apakah kelas sudah selesai
-        function isClassOver(tglStr, waktuSelesaiStr) {
+        // PEMBERSIH JAM ANEH DARI GOOGLE SHEETS
+        function formatWaktuBersih(timeStr) {
+            if (!timeStr || timeStr === "-") return "-";
+            // Cek apakah output dari backend berupa ISO String seperti 1899-12-30T10:52:48.000Z
+            if (String(timeStr).includes("T") && String(timeStr).includes("Z")) {
+                try {
+                    const d = new Date(timeStr);
+                    // Ambil jam UTC nya, lalu tambah 7 untuk mendapatkan WIB
+                    const utcHours = d.getUTCHours();
+                    const utcMinutes = d.getUTCMinutes();
+                    let wibHours = (utcHours + 7) % 24;
+                    return `${String(wibHours).padStart(2, '0')}:${String(utcMinutes).padStart(2, '0')}`;
+                } catch(e) { return timeStr; }
+            }
+            // Jika diketik manual oleh admin sebagai string biasa di sheet "18:00"
+            return timeStr; 
+        }
+
+        // HELPER LOGIKA KELAS SELESAI
+        function isClassOver(tglStr, jamSelesaiBersih) {
             if (!tglStr || tglStr === "-") return false;
             try {
                 const classDate = new Date(tglStr);
                 if(isNaN(classDate.getTime())) return false;
                 
-                if (waktuSelesaiStr && waktuSelesaiStr !== "-") {
-                    // Coba deteksi format "21:00" atau "21:00 WIB"
-                    const timeMatch = String(waktuSelesaiStr).match(/(\d{1,2}):(\d{2})/);
+                if (jamSelesaiBersih && jamSelesaiBersih !== "-") {
+                    const timeMatch = String(jamSelesaiBersih).match(/(\d{1,2}):(\d{2})/);
                     if (timeMatch) {
+                        // Pastikan menyetel jam pakai waktu lokal pengguna / sesuai perbandingan
                         classDate.setHours(parseInt(timeMatch[1]), parseInt(timeMatch[2]), 0);
                     } else {
-                        classDate.setHours(23, 59, 59); // Fallback ke ujung hari
+                        classDate.setHours(23, 59, 59); 
                     }
                 } else {
                     classDate.setHours(23, 59, 59);
                 }
-                return new Date() > classDate; // return true jika waktu sekarang lebih besar
+                
+                // Gunakan jam pengguna disimulasikan ke WIB untuk perbandingan paling adil
+                const now = new Date();
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+                const wibNow = new Date(utc + (3600000 * 7));
+                
+                return wibNow.getTime() > classDate.getTime();
             } catch(e) { return false; }
         }
 
@@ -605,6 +660,8 @@
         }
 
         function renderJadwal(jadwalData) {
+            startRealtimeClock(); // Mulai jam pasir WIB
+            
             const container = $('jadwal-list');
             if(!jadwalData || jadwalData.length === 0) {
                 container.innerHTML = `
@@ -615,8 +672,12 @@
                     </div>`;
             } else {
                 container.innerHTML = jadwalData.map(j => {
-                    const isOver = isClassOver(j.Tanggal, j.Waktu_Selesai);
+                    const jamMulai = formatWaktuBersih(j.Waktu_Mulai);
+                    const jamSelesai = formatWaktuBersih(j.Waktu_Selesai);
+                    
+                    const isOver = isClassOver(j.Tanggal, jamSelesai);
                     const tglRapi = formatTanggalIndonesia(j.Tanggal);
+                    
                     const mapel = j.Mata_Pelajaran || 'Sesi Kelas';
                     const guru = j.Nama_Guru || 'Tentor EXE';
                     
@@ -642,7 +703,7 @@
                                     ${isOver ? '<span class="text-[10px] font-bold uppercase tracking-wider text-red-500 bg-red-50 px-2 py-0.5 rounded">Selesai</span>' : '<span class="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded animate-pulse">Live / Akan Datang</span>'}
                                 </div>
                                 <h4 class="font-bold text-base md:text-lg text-slate-800">${mapel}</h4>
-                                <p class="text-xs md:text-sm text-slate-500 mt-1"><i class="far fa-calendar-alt mr-1"></i> ${tglRapi} • <i class="far fa-clock ml-1 mr-1"></i> ${j.Waktu_Mulai||'-'} s/d ${j.Waktu_Selesai||'-'}</p>
+                                <p class="text-xs md:text-sm text-slate-500 mt-1"><i class="far fa-calendar-alt mr-1"></i> ${tglRapi} <span class="mx-1">•</span> <i class="far fa-clock mr-1"></i> <b class="text-brand-pink">${jamMulai} s/d ${jamSelesai} WIB</b></p>
                             </div>
                         </div>
                         <div class="flex flex-col items-end gap-2 shrink-0">
