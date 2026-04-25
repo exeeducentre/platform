@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Platform Belajar - EXE Education Centre</title>
-    
+    <link rel="icon" href="favicon.png" type="image/png">
+        
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+        
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+        
     <!-- KaTeX for Math -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
@@ -21,11 +22,11 @@
 
     <script>
         tailwind.config = {
-            theme: { 
-                extend: { 
-                    fontFamily: { sans: ['Poppins', 'sans-serif'] }, 
-                    colors: { brand: { pink: '#d81b60', orange: '#f57c00', yellow: '#fbc02d', dark: '#1f2022', blue: '#2563eb' } } 
-                } 
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: { brand: { pink: '#d81b60', orange: '#f57c00', yellow: '#fbc02d', dark: '#1f2022', blue: '#2563eb' } }
+                }
             }
         };
     </script>
@@ -33,20 +34,15 @@
     <style>
         .bg-gradient-brand { background: linear-gradient(135deg, #d81b60 0%, #f57c00 50%, #fbc02d 100%); }
         .text-gradient-brand { background: linear-gradient(135deg, #d81b60 0%, #f57c00 50%, #fbc02d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        .view-section { display: none; animation: fadeIn 0.4s ease-in-out; } 
+        .view-section { display: none; animation: fadeIn 0.4s ease-in-out; }
         .view-section.active { display: block; }
-        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .katex { font-size: 1.1em; } 
+        .katex { font-size: 1.1em; }
         .soal-card img { max-width: 100%; height: auto; border-radius: 0.75rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; }
-        
-        ::-webkit-scrollbar { width: 8px; } 
-        ::-webkit-scrollbar-track { background: #f1f1f1; } 
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #d81b60; border-radius: 10px; }
-        
-        .is-correct { border: 2px solid #10b981 !important; background-color: #f0fdf4 !important; } 
+        .is-correct { border: 2px solid #10b981 !important; background-color: #f0fdf4 !important; }
         .is-wrong { border: 2px solid #ef4444 !important; background-color: #fef2f2 !important; }
         button:disabled { opacity: 0.7; cursor: not-allowed; }
     </style>
@@ -123,7 +119,7 @@
                 <img class="h-14 w-auto mx-auto mb-6" src="https://images2.imgbox.com/ad/c5/3XFVIZZN_o.png" alt="Logo EXE">
                 <h2 class="text-xl md:text-2xl font-bold text-brand-dark mb-2">Exe Students Centre</h2>
                 <p class="text-gray-500 text-sm mb-8">Masuk dengan Email terdaftar.</p>
-                                
+                
                 <div id="login-input-section" class="space-y-4 text-left">
                     <p id="login-feedback" class="text-sm text-center font-bold mb-4 hidden"></p>
                     
@@ -314,53 +310,56 @@
     </main>
 
     <script>
-        // --- KONFIGURASI API (URL Baru v4.2 - UPDATE DEPLOYMENT ID) ---
+        /* --- KONFIGURASI API --- */
+        // Sesuai permintaan, saya kembalikan API_URL ke URL STAGING (V1)
         const API_URL = "https://script.google.com/macros/s/AKfycbzOFMW35eZtt1ToZA12r6h7NwVQYtjoNXz-1EOXd5NT4E7s53AS6P7VbhuH3LQuuX6S/exec";
 
         const $ = id => document.getElementById(id);
-        
-        // ==============================================
-        // SECURITY DASAR (Menonaktifkan Klik Kanan)
-        // ==============================================
+
+        /* ============================================== */
+        /* SECURITY DASAR (Menonaktifkan Klik Kanan)      */
+        /* ============================================== */
         document.addEventListener('contextmenu', event => event.preventDefault());
 
         let currentUser = null;
-        let examMode = ""; // "TO", "BS", atau "KUIS"
+        let examMode = ""; /* "TO", "BS", atau "KUIS" */
         let currentMenuTree = {};
-        
-        // State Ujian
+
+        /* State Ujian */
         let state = { kat: "", mapel: "", topik: "", subtopik: "", to_ke: "", lvl: "", qty: 5 };
         let activeQuestions = [];
         let userAnswers = {};
         let timerInterval, targetTime;
 
-        // Meta Ikon UI
+        /* Meta Ikon UI */
         const ICONS = {
-            'SNBT': 'fa-university', 'TKA': 'fa-atom', 'Matematika': 'fa-calculator', 
+            'SNBT': 'fa-university', 'TKA': 'fa-atom', 'Matematika': 'fa-calculator',
             'Pengetahuan Kuantitatif': 'fa-square-root-variable', 'Literasi': 'fa-book-open',
             'Fisika': 'fa-rocket'
         };
 
-        // ==============================================
-        // INISIALISASI SESI (LOCALSTORAGE)
-        // ==============================================
+        /* ============================================== */
+        /* INISIALISASI SESI (LOCALSTORAGE)               */
+        /* ============================================== */
         window.addEventListener('DOMContentLoaded', () => {
             const savedSession = localStorage.getItem('exe_current_user');
             if(savedSession) {
                 try {
                     currentUser = JSON.parse(savedSession);
-                    setupDashboard(); // Lewati login, langsung ke dashboard
-                } catch(e) { localStorage.removeItem('exe_current_user'); }
+                    setupDashboard(); /* Lewati login, langsung ke dashboard */
+                } catch(e) { 
+                    localStorage.removeItem('exe_current_user'); 
+                }
             }
         });
 
-        // ==============================================
-        // GLOBAL MODAL & LUPA PASSWORD
-        // ==============================================
+        /* ============================================== */
+        /* GLOBAL MODAL & LUPA PASSWORD                   */
+        /* ============================================== */
         function showModal(title, desc, iconHtml) {
             $('modal-title').innerText = title;
             $('modal-desc').innerText = desc;
-            $('modal-icon').innerHTML = iconHtml || '<i class="fas fa-info-circle text-brand-pink"></i>';
+            $('modal-icon').innerHTML = iconHtml || "<i class='fas fa-info-circle text-brand-pink'></i>";
             const modal = $('global-modal');
             modal.classList.remove('hidden');
             setTimeout(() => modal.firstElementChild.classList.remove('scale-95'), 10);
@@ -377,10 +376,10 @@
                 showModal("Lupa Password?", "Silakan ketik Email kamu di kolom isian terlebih dahulu, lalu klik tombol 'Lupa Password' lagi.", "<i class='fas fa-question-circle text-brand-orange'></i>");
                 return;
             }
-            
+
             const btn = $('btn-forgot-password');
             const oldText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Mengirim...";
             btn.style.pointerEvents = 'none';
 
             try {
@@ -403,16 +402,18 @@
             }
         }
 
-        // ==============================================
-        // GANTI PASSWORD MODAL LOGIC
-        // ==============================================
+        /* ============================================== */
+        /* GANTI PASSWORD MODAL LOGIC                     */
+        /* ============================================== */
         function openPasswordModal() {
             $('old-password').value = ""; $('new-password').value = ""; $('confirm-password').value = "";
             $('password-feedback').classList.add('hidden');
             $('password-modal').classList.remove('hidden');
         }
 
-        function closePasswordModal() { $('password-modal').classList.add('hidden'); }
+        function closePasswordModal() { 
+            $('password-modal').classList.add('hidden'); 
+        }
 
         async function prosesGantiPassword() {
             const oldPass = $('old-password').value;
@@ -423,21 +424,24 @@
             if (!oldPass || !newPass || !confirmPass) {
                 feedback.innerText = "Semua kolom wajib diisi!";
                 feedback.className = "text-sm text-center font-bold mb-4 text-red-500";
-                feedback.classList.remove('hidden'); return;
+                feedback.classList.remove('hidden'); 
+                return;
             }
             if (newPass !== confirmPass) {
                 feedback.innerText = "Password baru dan konfirmasi tidak cocok!";
                 feedback.className = "text-sm text-center font-bold mb-4 text-red-500";
-                feedback.classList.remove('hidden'); return;
+                feedback.classList.remove('hidden'); 
+                return;
             }
             if (newPass.length < 6) {
                 feedback.innerText = "Password baru minimal 6 karakter.";
                 feedback.className = "text-sm text-center font-bold mb-4 text-red-500";
-                feedback.classList.remove('hidden'); return;
+                feedback.classList.remove('hidden'); 
+                return;
             }
 
             const btn = $('btn-save-password');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memproses...';
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Memproses...";
             btn.disabled = true;
 
             try {
@@ -451,15 +455,15 @@
                     feedback.innerText = result.message;
                     feedback.className = "text-sm text-center font-bold mb-4 text-green-600";
                     feedback.classList.remove('hidden');
-                    
-                    // Update current user password cache in local storage
-                    currentUser.Password = newPass; 
+
+                    /* Update current user password cache in local storage */
+                    currentUser.Password = newPass;
                     localStorage.setItem('exe_current_user', JSON.stringify(currentUser));
 
-                    setTimeout(() => { 
-                        closePasswordModal(); 
-                        showModal("Berhasil!", "Password Anda berhasil diperbarui.", "<i class='fas fa-check-circle text-green-500'></i>"); 
-                    }, 1500);
+                    setTimeout(() => {
+                         closePasswordModal();
+                         showModal("Berhasil!", "Password Anda berhasil diperbarui.", "<i class='fas fa-check-circle text-green-500'></i>");
+                     }, 1500);
                 } else {
                     feedback.innerText = result.message || "Gagal mengubah password.";
                     feedback.className = "text-sm text-center font-bold mb-4 text-red-500";
@@ -474,28 +478,28 @@
             }
         }
 
-        // ==============================================
-        // FORMATTING UTILITIES & JAM REALTIME
-        // ==============================================
+        /* ============================================== */
+        /* FORMATTING UTILITIES & JAM REALTIME            */
+        /* ============================================== */
         function parseInlineImages(text) {
             if (!text) return "";
             let parsed = String(text);
-            parsed = parsed.replace(/\[GAMBAR:\s*(https?:\/\/[^\s\]]+)\]/gi, '<br><img src="$1" class="max-w-md w-full mx-auto my-4 rounded-xl border border-slate-200 shadow-sm"><br>');
-            parsed = parsed.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-800">$1</strong>');
-            parsed = parsed.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
-            parsed = parsed.replace(/\n/g, '<br>');
+            parsed = parsed.replace(/\[GAMBAR:\s*(https?:\/\/[^\s\]]+)\]/gi, "<br><img src='$1' class='max-w-md w-full mx-auto my-4 rounded-xl border border-slate-200 shadow-sm'><br>");
+            parsed = parsed.replace(/\*\*(.*?)\*\*/g, "<strong class='font-bold text-slate-800'>$1</strong>");
+            parsed = parsed.replace(/\*(.*?)\*/g, "<em class='italic'>$1</em>");
+            parsed = parsed.replace(/\n/g, "<br>");
             return parsed;
         }
 
-        function triggerMath(el) { 
-            if (window.renderMathInElement) renderMathInElement(el || document.body, { delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}], throwOnError: false }); 
-        }
+        function triggerMath(el) {
+             if (window.renderMathInElement) renderMathInElement(el || document.body, { delimiters: [{left: "$$", right: "$$", display: true}, {left: "$", right: "$", display: false}], throwOnError: false });
+         }
 
         function navigateTo(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); 
-            $(viewId).classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-        }
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+             $(viewId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+         }
 
         function showLoading(title = "Memproses...", desc = "Harap tunggu sebentar") {
             $('loading-title').innerText = title; $('loading-desc').innerText = desc;
@@ -503,20 +507,20 @@
         }
         function hideLoading() { $('global-loading').classList.add('hidden'); }
 
-        // JAM REAL-TIME (WIB)
+        /* JAM REAL-TIME (WIB) */
         let clockInterval;
         function startRealtimeClock() {
             if (clockInterval) clearInterval(clockInterval);
             const updateClock = () => {
                 const now = new Date();
-                // Mengkonversi ke waktu WIB (UTC + 7) dengan pasti
+                /* Mengkonversi ke waktu WIB (UTC + 7) dengan pasti */
                 const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
                 const wibDate = new Date(utc + (3600000 * 7));
-                
+
                 const h = String(wibDate.getHours()).padStart(2, '0');
                 const m = String(wibDate.getMinutes()).padStart(2, '0');
                 const s = String(wibDate.getSeconds()).padStart(2, '0');
-                
+
                 const clockEl = $('realtime-clock');
                 if (clockEl) clockEl.innerText = `${h}:${m}:${s}`;
             };
@@ -524,7 +528,7 @@
             clockInterval = setInterval(updateClock, 1000);
         }
 
-        // FORMAT TANGGAL
+        /* FORMAT TANGGAL */
         function formatTanggalIndonesia(dateStr) {
             try {
                 const date = new Date(dateStr);
@@ -535,7 +539,7 @@
             } catch(e) { return dateStr; }
         }
 
-        // PEMBERSIH JAM ANEH DARI GOOGLE SHEETS (Tetap Ada Untuk Teks Display)
+        /* PEMBERSIH JAM ANEH DARI GOOGLE SHEETS (Tetap Ada Untuk Teks Display) */
         function formatWaktuBersih(timeStr) {
             if (!timeStr || timeStr === "-") return "-";
             if (String(timeStr).includes("T") && String(timeStr).includes("Z")) {
@@ -544,24 +548,24 @@
                     return d.toLocaleTimeString('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' });
                 } catch(e) { return timeStr; }
             }
-            return timeStr; 
-        }
+            return timeStr;
+         }
 
-        // HELPER 3 STATUS KELAS CERDAS (Akan Datang / Sedang Live / Selesai)
+        /* HELPER 3 STATUS KELAS CERDAS (Akan Datang / Sedang Live / Selesai) */
         function getClassStatus(tglStr, jamMulaiStr, jamSelesaiStr) {
             if (!tglStr || tglStr === "-") return "UNKNOWN";
             try {
                 const now = new Date();
                 const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const wibNow = new Date(utc + (3600000 * 7)); // Waktu saat ini di WIB
+                const wibNow = new Date(utc + (3600000 * 7)); /* Waktu saat ini di WIB */
 
-                // Parse Start Time (Mendukung titik dan titik dua spt 18.00 atau 18:00)
+                /* Parse Start Time (Mendukung titik dan titik dua spt 18.00 atau 18:00) */
                 let startDate = new Date(tglStr);
                 const matchMulai = String(jamMulaiStr).match(/(\d{1,2})[:.](\d{2})/);
                 if (matchMulai) startDate.setHours(parseInt(matchMulai[1]), parseInt(matchMulai[2]), 0);
                 else startDate.setHours(0, 0, 0);
 
-                // Parse End Time (Mendukung titik dan titik dua spt 19.30 atau 19:30)
+                /* Parse End Time (Mendukung titik dan titik dua spt 19.30 atau 19:30) */
                 let endDate = new Date(tglStr);
                 const matchSelesai = String(jamSelesaiStr).match(/(\d{1,2})[:.](\d{2})/);
                 if (matchSelesai) endDate.setHours(parseInt(matchSelesai[1]), parseInt(matchSelesai[2]), 0);
@@ -575,22 +579,24 @@
             return "UNKNOWN";
         }
 
-        // ==============================================
-        // AUTHENTICATION
-        // ==============================================
+        /* ============================================== */
+        /* AUTHENTICATION                                 */
+        /* ============================================== */
         async function prosesLogin() {
             const email = $('input-email').value.trim();
             const password = $('input-password').value;
             const feedback = $('login-feedback');
-            
-            if(!email || !password) { 
-                feedback.innerText = "Email dan password wajib diisi."; 
-                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
-                feedback.classList.remove('hidden'); return; 
-            }
+
+            if(!email || !password) {
+                 feedback.innerText = "Email dan password wajib diisi.";
+                 feedback.className = "text-sm text-center font-bold mb-4 text-red-500";
+                 feedback.classList.remove('hidden'); 
+                 return;
+             }
 
             const btn = $('btn-proses-login');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengecek...'; btn.disabled = true;
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Mengecek..."; 
+            btn.disabled = true;
 
             try {
                 const response = await fetch(API_URL, {
@@ -601,8 +607,8 @@
 
                 if(result.status === "success") {
                     currentUser = result.data.user;
-                    localStorage.setItem('exe_current_user', JSON.stringify(currentUser)); // Simpan Sesi
-                    
+                    localStorage.setItem('exe_current_user', JSON.stringify(currentUser)); /* Simpan Sesi */
+
                     feedback.classList.add('hidden');
                     $('input-password').value = "";
                     setupDashboard();
@@ -616,30 +622,33 @@
                 feedback.className = "text-sm text-center font-bold mb-4 text-red-500";
                 feedback.classList.remove('hidden');
             } finally {
-                btn.innerHTML = 'Masuk Dashboard'; btn.disabled = false;
+                btn.innerHTML = 'Masuk Dashboard'; 
+                btn.disabled = false;
             }
         }
 
         function setupDashboard() {
             const namaDepan = currentUser.Nama.split(' ')[0];
-            $('display-nama').innerText = namaDepan; $('dash-nama').innerText = namaDepan;
+            $('display-nama').innerText = namaDepan; 
+            $('dash-nama').innerText = namaDepan;
             $('main-nav').classList.remove('hidden');
             navigateTo('dashboard-view');
         }
 
         function doLogout() {
-            currentUser = null; 
-            localStorage.removeItem('exe_current_user'); // Hapus sesi
+            currentUser = null;
+            localStorage.removeItem('exe_current_user'); /* Hapus sesi */
             $('main-nav').classList.add('hidden');
-            $('input-email').value = ""; $('input-password').value = "";
+            $('input-email').value = ""; 
+            $('input-password').value = "";
             navigateTo('auth-view');
         }
 
-        // ==============================================
-        // JADWAL KELAS ENGINE
-        // ==============================================
+        /* ============================================== */
+        /* JADWAL KELAS ENGINE                            */
+        /* ============================================== */
         async function initJadwal() {
-            // Blokir akses untuk EXE-cutive Silver
+            /* Blokir akses untuk EXE-cutive Silver */
             if (currentUser.Paket && String(currentUser.Paket).toUpperCase().includes("SILVER")) {
                 showModal("Akses Terbatas", "Maaf, akun Anda terdaftar pada paket EXE-cutive Silver yang tidak memiliki akses ke fitur Jadwal Kelas Interaktif.\n\nFokuslah pada latihan mandiri di Bank Soal dan Try Out!", "<i class='fas fa-lock text-brand-pink'></i>");
                 return;
@@ -647,26 +656,28 @@
 
             showLoading("Memuat Jadwal", "Mengambil sinkronisasi jadwal kelas...");
             try {
-                // Sekarang mengirimkan parameter KELAS, PAKET, dan EMAIL untuk disaring oleh Backend
+                /* Sekarang mengirimkan parameter KELAS, PAKET, dan EMAIL untuk disaring oleh Backend */
                 let res = await fetch(API_URL, {
                     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ 
-                        action: "get_jadwal", 
-                        kelas: currentUser.Kelas, 
-                        paket: currentUser.Paket,
-                        email: currentUser.Email // <-- Penambahan kunci untuk Private Filtering
+                    body: JSON.stringify({
+                         action: "get_jadwal",
+                         kelas: currentUser.Kelas,
+                         paket: currentUser.Paket,
+                         email: currentUser.Email /* <-- Penambahan kunci untuk Private Filtering */
                     })
                 });
                 let data = await res.json();
                 renderJadwal(data.data || []);
-            } catch(e) { 
-                renderJadwal([]); 
-            } finally { hideLoading(); }
+            } catch(e) {
+                 renderJadwal([]);
+             } finally { 
+                 hideLoading(); 
+             }
         }
 
         function renderJadwal(jadwalData) {
-            startRealtimeClock(); // Mulai jam pasir WIB
-            
+            startRealtimeClock(); /* Mulai jam pasir WIB */
+
             const container = $('jadwal-list');
             if(!jadwalData || jadwalData.length === 0) {
                 container.innerHTML = `
@@ -679,32 +690,32 @@
                 container.innerHTML = jadwalData.map(j => {
                     const jamMulai = formatWaktuBersih(j.Waktu_Mulai);
                     const jamSelesai = formatWaktuBersih(j.Waktu_Selesai);
-                    
+
                     const statusKelas = getClassStatus(j.Tanggal, jamMulai, jamSelesai);
                     const tglRapi = formatTanggalIndonesia(j.Tanggal);
-                    
+
                     const mapel = j.Mata_Pelajaran || 'Sesi Kelas';
                     const guru = j.Nama_Guru || 'Tentor EXE';
-                    
-                    // Periksa Pre/Post Test
+
+                    /* Periksa Pre/Post Test */
                     let preTestBtn = (j.Kode_PreTest && j.Kode_PreTest !== "-") ? `<button onclick="executeQuizByKode('${j.Kode_PreTest}', 'Pre-Test ${mapel}')" class="px-3 py-1.5 bg-brand-orange text-white text-xs rounded-lg font-bold shadow-sm hover:scale-105 transition">Pre-Test</button>` : '';
                     let postTestBtn = (j.Kode_PostTest && j.Kode_PostTest !== "-") ? `<button onclick="executeQuizByKode('${j.Kode_PostTest}', 'Post-Test ${mapel}')" class="px-3 py-1.5 bg-brand-pink text-white text-xs rounded-lg font-bold shadow-sm hover:scale-105 transition">Post-Test</button>` : '';
-                    
-                    // Render Tombol & Label 3 Status
+
+                    /* Render Tombol & Label 3 Status */
                     let primaryAction = "";
                     let badgeStatus = "";
-                    
+
                     if (statusKelas === "UPCOMING") {
-                        badgeStatus = '<span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Akan Datang</span>';
+                        badgeStatus = `<span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Akan Datang</span>`;
                         primaryAction = `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left"><i class="fas fa-clock mr-1"></i>Belum Mulai</span>`;
                     } else if (statusKelas === "ONGOING") {
-                        badgeStatus = '<span class="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded animate-pulse">Sedang Live</span>';
+                        badgeStatus = `<span class="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded animate-pulse">Sedang Live</span>`;
                         primaryAction = (j.Link_Kelas && j.Link_Kelas !== "-") ? `<a href="${j.Link_Kelas}" target="_blank" class="w-full md:w-auto px-6 py-3 bg-brand-blue text-white rounded-xl text-sm font-bold hover:bg-blue-700 text-center transition-colors shadow-lg"><i class="fas fa-video mr-2"></i>Gabung Live</a>` : `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">Link Segera Hadir</span>`;
                     } else if (statusKelas === "FINISHED") {
-                        badgeStatus = '<span class="text-[10px] font-bold uppercase tracking-wider text-red-500 bg-red-50 px-2 py-0.5 rounded">Selesai</span>';
+                        badgeStatus = `<span class="text-[10px] font-bold uppercase tracking-wider text-red-500 bg-red-50 px-2 py-0.5 rounded">Selesai</span>`;
                         primaryAction = (j.Link_Rekaman && j.Link_Rekaman !== "-") ? `<a href="${j.Link_Rekaman}" target="_blank" class="w-full md:w-auto px-6 py-3 bg-slate-700 text-white rounded-xl text-sm font-bold hover:bg-slate-900 text-center transition-colors shadow-lg"><i class="fas fa-play-circle mr-2"></i>Tonton Rekaman</a>` : `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">Kelas Selesai (Rekaman OTW)</span>`;
                     } else {
-                        badgeStatus = '<span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Sesi Kelas</span>';
+                        badgeStatus = `<span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">Sesi Kelas</span>`;
                         primaryAction = `<span class="text-xs text-slate-400 font-bold bg-slate-100 px-3 py-1.5 rounded-lg text-center md:text-left">...</span>`;
                     }
 
@@ -731,16 +742,16 @@
             navigateTo('jadwal-view');
         }
 
-        // ==============================================
-        // QUIZ PRE/POST TEST ENGINE (KODE SET)
-        // ==============================================
+        /* ============================================== */
+        /* QUIZ PRE/POST TEST ENGINE (KODE SET)           */
+        /* ============================================== */
         async function executeQuizByKode(kode_set, judulKuis) {
-            examMode = "BS"; // Kuis otomatis disamakan skemanya dengan Bank Soal
+            examMode = "BS"; /* Kuis otomatis disamakan skemanya dengan Bank Soal */
             state.mapel = "Kuis Sesi Kelas";
             state.topik = judulKuis;
             state.subtopik = kode_set;
             state.lvl = "UJI PEMAHAMAN";
-            
+
             showLoading("Mencari Soal", `Menyiapkan ${judulKuis}...`);
             try {
                 let res = await fetch(API_URL, {
@@ -748,24 +759,29 @@
                     body: JSON.stringify({ action: "get_quiz_by_kode", kode_set: kode_set })
                 });
                 let qData = await res.json();
-                
+
                 if(qData.status === "found") {
                     activeQuestions = qData.data;
                     $('exam-title').innerText = judulKuis;
                     userAnswers = {};
                     state.qty = activeQuestions.length;
-                    renderExamUI(); // Timer akan dikalkulasi di dalam renderExamUI
+                    renderExamUI(); /* Timer akan dikalkulasi di dalam renderExamUI */
                 } else {
                     showModal("Kuis Tidak Ditemukan", "Soal untuk kuis ini belum dimasukkan atau kode set-nya salah. Silakan hubungi admin.", "<i class='fas fa-box-open text-brand-orange'></i>");
                 }
-            } catch(e) { alert("Gagal memuat kuis."); } finally { hideLoading(); }
+            } catch(e) { 
+                alert("Gagal memuat kuis."); 
+            } finally { 
+                hideLoading(); 
+            }
         }
 
-        // ==============================================
-        // TRY OUT ENGINE
-        // ==============================================
+        /* ============================================== */
+        /* TRY OUT ENGINE                                 */
+        /* ============================================== */
         async function initTryOut() {
-            examMode = "TO"; showLoading("Memuat Data Try Out", "Mengambil jadwal TO dari database...");
+            examMode = "TO"; 
+            showLoading("Memuat Data Try Out", "Mengambil jadwal TO dari database...");
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -774,14 +790,22 @@
                 const result = await response.json();
                 currentMenuTree = result.data || {};
                 renderMenu1_TO();
-            } catch(e) { alert("Gagal memuat Try Out."); } finally { hideLoading(); }
+            } catch(e) { 
+                alert("Gagal memuat Try Out."); 
+            } finally { 
+                hideLoading(); 
+            }
         }
 
         function renderMenu1_TO() {
             const kats = Object.keys(currentMenuTree);
-            if(kats.length === 0) { showModal("Oops!", "Belum ada Try Out untuk kelas Anda saat ini."); return; }
-            
-            $('lbl-menu1-title').innerText = "Pilih Kategori Ujian"; $('lbl-menu1-desc').innerText = "Simulasi Try Out";
+            if(kats.length === 0) { 
+                showModal("Oops!", "Belum ada Try Out untuk kelas Anda saat ini."); 
+                return; 
+            }
+
+            $('lbl-menu1-title').innerText = "Pilih Kategori Ujian"; 
+            $('lbl-menu1-desc').innerText = "Simulasi Try Out";
             $('menu1-grid').innerHTML = kats.map(k => {
                 const ic = ICONS[k] || 'fa-folder';
                 return `<button onclick="selectKat_TO('${k}')" class="p-6 md:p-8 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:border-brand-pink hover:shadow-md transition-all group flex items-center gap-4 text-left"><div class="w-12 h-12 md:w-14 md:h-14 bg-pink-50 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-brand-pink transition-colors"><i class="fas ${ic} text-brand-pink text-lg md:text-xl group-hover:text-white"></i></div><h3 class="font-bold text-lg md:text-xl text-slate-700">${k}</h3></button>`;
@@ -792,8 +816,9 @@
         function selectKat_TO(kat) {
             state.kat = kat;
             const mapels = Object.keys(currentMenuTree[kat] || {});
-            
-            $('lbl-menu2-title').innerText = "Pilih Mata Pelajaran"; $('lbl-menu2-desc').innerText = `Kategori: ${kat}`;
+
+            $('lbl-menu2-title').innerText = "Pilih Mata Pelajaran"; 
+            $('lbl-menu2-desc').innerText = `Kategori: ${kat}`;
             $('menu2-grid').innerHTML = mapels.map(m => {
                 const ic = ICONS[m] || 'fa-book';
                 return `<button onclick="selectMapel_TO('${m}')" class="p-5 md:p-6 bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-md transition-all group flex flex-col items-center justify-center h-full"><i class="fas ${ic} text-2xl md:text-3xl text-slate-400 mb-2 md:mb-3 group-hover:text-brand-pink"></i><span class="font-bold text-xs md:text-sm text-slate-700 text-center">${m}</span></button>`;
@@ -804,8 +829,9 @@
         function selectMapel_TO(mapel) {
             state.mapel = mapel;
             const sesis = currentMenuTree[state.kat][mapel] || [];
-            
-            $('lbl-menu3-title').innerText = "Pilih Sesi TO"; $('lbl-menu3-desc').innerText = `${state.kat} - ${mapel}`;
+
+            $('lbl-menu3-title').innerText = "Pilih Sesi TO"; 
+            $('lbl-menu3-desc').innerText = `${state.kat} - ${mapel}`;
             $('menu3-grid').innerHTML = sesis.sort((a,b)=>a-b).map(s => {
                 return `<button onclick="executeTryOut(${s})" class="p-6 md:p-8 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:border-brand-pink hover:bg-pink-50 hover:shadow-md transition-all group"><h3 class="font-bold text-xl md:text-2xl text-slate-700 group-hover:text-brand-pink">TO Ke-${s}</h3></button>`;
             }).join("");
@@ -813,46 +839,51 @@
         }
 
         async function executeTryOut(to_ke) {
-            state.to_ke = to_ke; 
+            state.to_ke = to_ke;
             showLoading("Mengambil Soal", `Menyiapkan TO ${to_ke}...`);
-            
+
             try {
-                // Cek Riwayat Dulu
+                /* Cek Riwayat Dulu */
                 let rRes = await fetch(API_URL, {
                     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: "check_history", type: "TO", nama: currentUser.Nama, kategori: state.kat, mapel: state.mapel, to_ke: state.to_ke })
                 });
                 let riwayat = await rRes.json();
 
-                // Tarik Soal
+                /* Tarik Soal */
                 let qRes = await fetch(API_URL, {
                     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: "get_tryout_questions", kelas: currentUser.Kelas, kategori: state.kat, mapel: state.mapel, to_ke: state.to_ke })
                 });
                 let qData = await qRes.json();
-                
+
                 if(qData.status === "found") {
                     activeQuestions = qData.data;
                     $('exam-title').innerText = `TO ${state.to_ke} - ${state.mapel}`;
-                    
+
                     if(riwayat.status === "found") {
                         userAnswers = riwayat.data.jawaban_user || {};
-                        processResult(true, riwayat.data.skor); // Masuk mode hasil
+                        processResult(true, riwayat.data.skor); /* Masuk mode hasil */
                     } else {
                         userAnswers = {};
-                        renderExamUI(); // Masuk mode pengerjaan (Timer otomatis membaca Durasi_Menit dari JSON)
+                        renderExamUI(); /* Masuk mode pengerjaan (Timer otomatis membaca Durasi_Menit dari JSON) */
                     }
                 } else {
                     renderEmptyExam("Belum ada soal Try Out yang disusun untuk sesi ini.");
                 }
-            } catch(e) { alert("Gagal memuat ujian."); } finally { hideLoading(); }
+            } catch(e) { 
+                alert("Gagal memuat ujian."); 
+            } finally { 
+                hideLoading(); 
+            }
         }
 
-        // ==============================================
-        // BANK SOAL ENGINE
-        // ==============================================
+        /* ============================================== */
+        /* BANK SOAL ENGINE                               */
+        /* ============================================== */
         async function initBankSoal() {
-            examMode = "BS"; showLoading("Memuat Bank Soal", "Menarik peta materi...");
+            examMode = "BS"; 
+            showLoading("Memuat Bank Soal", "Menarik peta materi...");
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -861,14 +892,22 @@
                 const result = await response.json();
                 currentMenuTree = result.data || {};
                 renderMenu1_BS();
-            } catch(e) { alert("Gagal memuat Bank Soal."); } finally { hideLoading(); }
+            } catch(e) { 
+                alert("Gagal memuat Bank Soal."); 
+            } finally { 
+                hideLoading(); 
+            }
         }
 
         function renderMenu1_BS() {
             const mapels = Object.keys(currentMenuTree);
-            if(mapels.length === 0) { showModal("Oops!", "Belum ada materi Bank Soal untuk kelas Anda."); return; }
-            
-            $('lbl-menu1-title').innerText = "Pilih Mata Pelajaran"; $('lbl-menu1-desc').innerText = "Bank Soal - Bebas Pilih Materi";
+            if(mapels.length === 0) { 
+                showModal("Oops!", "Belum ada materi Bank Soal untuk kelas Anda."); 
+                return; 
+            }
+
+            $('lbl-menu1-title').innerText = "Pilih Mata Pelajaran"; 
+            $('lbl-menu1-desc').innerText = "Bank Soal - Bebas Pilih Materi";
             $('menu1-grid').innerHTML = mapels.map(m => {
                 const ic = ICONS[m] || 'fa-book';
                 return `<button onclick="selectMapel_BS('${m}')" class="p-6 md:p-8 bg-white border border-slate-100 rounded-3xl md:rounded-[2rem] shadow-sm hover:border-brand-orange hover:shadow-md transition-all flex flex-col items-center justify-center text-center"><i class="fas ${ic} text-3xl md:text-4xl text-brand-orange mb-3 md:mb-4"></i><h3 class="font-bold text-xs md:text-sm text-slate-700">${m}</h3></button>`;
@@ -879,8 +918,9 @@
         function selectMapel_BS(mapel) {
             state.mapel = mapel;
             const topiks = Object.keys(currentMenuTree[mapel] || {});
-            
-            $('lbl-menu2-title').innerText = "Pilih Topik Materi"; $('lbl-menu2-desc').innerText = `Mapel: ${mapel}`;
+
+            $('lbl-menu2-title').innerText = "Pilih Topik Materi"; 
+            $('lbl-menu2-desc').innerText = `Mapel: ${mapel}`;
             $('menu2-grid').innerHTML = topiks.map(t => {
                 return `<button onclick="selectTopik_BS('${t}')" class="p-4 md:p-5 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-brand-orange hover:shadow-md transition-all text-left"><span class="font-bold text-xs md:text-sm text-slate-700">${t}</span></button>`;
             }).join("");
@@ -890,8 +930,9 @@
         function selectTopik_BS(topik) {
             state.topik = topik;
             const subtopiks = Object.keys(currentMenuTree[state.mapel][topik] || {});
-            
-            $('lbl-menu3-title').innerText = "Pilih Subtopik Spesifik"; $('lbl-menu3-desc').innerText = `Topik: ${topik}`;
+
+            $('lbl-menu3-title').innerText = "Pilih Subtopik Spesifik"; 
+            $('lbl-menu3-desc').innerText = `Topik: ${topik}`;
             $('menu3-grid').innerHTML = subtopiks.map(s => {
                 return `<button onclick="selectSubtopik_BS('${s}')" class="p-4 md:p-5 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-brand-orange hover:bg-orange-50 transition-all text-left group"><div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Materi</div><span class="font-bold text-xs md:text-sm text-slate-700 group-hover:text-brand-orange">${s}</span></button>`;
             }).join("");
@@ -901,19 +942,20 @@
         function selectSubtopik_BS(subtopik) {
             state.subtopik = subtopik;
             $('lbl-bs-subtopik').innerText = subtopik;
-            
+
             const levels = currentMenuTree[state.mapel][state.topik][subtopik] || [];
-            
+
             $('bs-level-container').innerHTML = levels.map(l => {
                 let colorClass = "border-slate-200 text-slate-500 hover:border-slate-400";
                 if(l.toUpperCase() === 'MUDAH') colorClass = "border-green-200 text-green-600 hover:bg-green-50";
                 if(l.toUpperCase() === 'SEDANG') colorClass = "border-yellow-200 text-yellow-600 hover:bg-yellow-50";
                 if(l.toUpperCase() === 'SULIT') colorClass = "border-red-200 text-red-600 hover:bg-red-50";
-                
+
                 return `<button onclick="setLvlBS('${l}', this)" class="lvl-btn px-4 md:px-6 py-2.5 md:py-3 rounded-lg md:rounded-xl border-2 font-bold transition-all text-xs md:text-sm ${colorClass}">${l}</button>`;
             }).join("");
-            
-            state.lvl = ""; $('bs-jumlah').value = 5;
+
+            state.lvl = ""; 
+            $('bs-jumlah').value = 5;
             navigateTo('bs-config-view');
         }
 
@@ -924,18 +966,21 @@
         }
 
         async function executeBankSoal() {
-            if(!state.lvl) { showModal("Peringatan", "Pilih level kesulitan dulu ya!"); return; }
+            if(!state.lvl) { 
+                showModal("Peringatan", "Pilih level kesulitan dulu ya!"); 
+                return; 
+            }
             state.qty = $('bs-jumlah').value;
-            
+
             showLoading("Membuat Paket Latihan", "Mengambil soal secara acak...");
-            
+
             try {
                 let res = await fetch(API_URL, {
                     method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: "get_bank_soal_questions", kelas: currentUser.Kelas, mapel: state.mapel, topik: state.topik, subtopik: state.subtopik, level: state.lvl, qty: state.qty })
                 });
                 let qData = await res.json();
-                
+
                 if(qData.status === "found") {
                     activeQuestions = qData.data;
                     $('exam-title').innerText = `Latihan: ${state.subtopik}`;
@@ -944,13 +989,17 @@
                 } else {
                     renderEmptyExam("Bank Soal belum memiliki soal untuk konfigurasi ini.");
                 }
-            } catch(e) { alert("Gagal memuat ujian."); } finally { hideLoading(); }
+            } catch(e) { 
+                alert("Gagal memuat ujian."); 
+            } finally { 
+                hideLoading(); 
+            }
         }
 
-        // ==============================================
-        // CORE RENDERER UJIAN & KOSONG
-        // ==============================================
-        
+        /* ============================================== */
+        /* CORE RENDERER UJIAN & KOSONG                   */
+        /* ============================================== */
+
         function renderEmptyExam(msg) {
             const container = $('exam-container');
             container.innerHTML = `
@@ -967,17 +1016,19 @@
 
         function renderExamUI() {
             $('exam-footer').classList.remove('hidden');
-            $('btn-submit').innerHTML = 'Kumpulkan Jawaban'; $('btn-submit').disabled = false;
-            
-            const container = $('exam-container'); container.innerHTML = "";
-            
+            $('btn-submit').innerHTML = 'Kumpulkan Jawaban'; 
+            $('btn-submit').disabled = false;
+
+            const container = $('exam-container'); 
+            container.innerHTML = "";
+
             activeQuestions.forEach((s, idx) => {
                 const no = s.No_Soal || (idx + 1);
                 const type = Number(s.Tipe_Soal) || 1;
-                
+
                 let stim = s.Stimulus ? String(s.Stimulus) : "";
                 stim = stim.includes('[GAMBAR:') ? parseInlineImages(stim) : (stim.trim().startsWith('http') ? `<img src="${stim.trim()}" class="max-w-full h-auto rounded-xl border">` : stim);
-                
+
                 let optHTML = "";
                 if (type === 3) {
                     const stmts = [s.Opsi_A, s.Opsi_B, s.Opsi_C].filter(x => x && x !== "-");
@@ -996,54 +1047,67 @@
 
                 container.innerHTML += `<div class="bg-white p-5 md:p-10 rounded-[2rem] shadow-sm border border-slate-100 soal-card relative overflow-hidden"><div class="flex flex-col md:flex-row items-start gap-4 md:gap-6"><div class="bg-slate-100 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-slate-500 shrink-0 text-sm">${no}</div><div class="flex-1 w-full overflow-x-hidden"><div class="mb-4 text-slate-600 leading-relaxed text-xs md:text-sm overflow-x-auto">${stim}</div><div class="text-base md:text-lg font-bold mb-6 text-brand-dark overflow-x-auto">${parseInlineImages(s.Pertanyaan)}</div><div class="grid grid-cols-1">${optHTML}</div></div></div></div>`;
             });
-            
+
             triggerMath(container);
-            
-            // Logika Penentuan Timer
+
+            /* Logika Penentuan Timer */
             let durasi = 60;
             if (examMode === "BS") {
-                durasi = Number(state.qty) * 2; // Bank Soal: 2 Menit x Jumlah Soal
+                durasi = Number(state.qty) * 2; /* Bank Soal: 2 Menit x Jumlah Soal */
             } else if (examMode === "TO") {
-                // Try Out: Mengambil langsung nilai Durasi_Menit dari DB (baris soal pertama)
+                /* Try Out: Mengambil langsung nilai Durasi_Menit dari DB (baris soal pertama) */
                 durasi = Number(activeQuestions[0].Durasi_Menit) || 60;
             }
             initTimer(durasi);
-            
+
             navigateTo('exam-view');
         }
 
         function saveSingleAns(no, val) { userAnswers[no] = val; }
-        function saveMultiAns(no) { userAnswers[no] = Array.from(document.querySelectorAll(`input[name="q${no}"]:checked`)).map(c => c.value).sort().join(","); }
-        function saveTableAns(no, rowNo, val) { if (!userAnswers[no]) userAnswers[no] = {}; userAnswers[no][rowNo] = val; }
+        
+        function saveMultiAns(no) { 
+            userAnswers[no] = Array.from(document.querySelectorAll(`input[name="q${no}"]:checked`)).map(c => c.value).sort().join(","); 
+        }
+        
+        function saveTableAns(no, rowNo, val) { 
+            if (!userAnswers[no]) userAnswers[no] = {}; 
+            userAnswers[no][rowNo] = val; 
+        }
 
         function initTimer(mins) {
-            clearInterval(timerInterval); targetTime = Date.now() + mins * 60000;
+            clearInterval(timerInterval); 
+            targetTime = Date.now() + mins * 60000;
             timerInterval = setInterval(() => {
                 const diff = targetTime - Date.now();
-                if (diff <= 0) { clearInterval(timerInterval); submitExam(); return; }
+                if (diff <= 0) { 
+                    clearInterval(timerInterval); 
+                    submitExam(); 
+                    return; 
+                }
                 const m = Math.floor(diff/60000), s = Math.floor((diff/1000)%60);
                 $('timer-box').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
             }, 1000);
         }
 
-        // ==============================================
-        // SUBMIT & RESULT
-        // ==============================================
+        /* ============================================== */
+        /* SUBMIT & RESULT                                */
+        /* ============================================== */
         async function submitExam() {
             clearInterval(timerInterval);
-            $('btn-submit').innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Mengirim...'; $('btn-submit').disabled = true;
+            $('btn-submit').innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Mengirim..."; 
+            $('btn-submit').disabled = true;
             await processResult(false, null);
         }
 
         async function processResult(isHistoryMode = false, historyScore = null) {
             let correct = 0; const reviewList = $('review-list'); reviewList.innerHTML = "";
-            let analisisTeks = "Selesai dikerjakan."; // Simplifikasi untuk demo
+            let analisisTeks = "Selesai dikerjakan."; /* Simplifikasi untuk demo */
 
             activeQuestions.forEach((s, idx) => {
                 const no = s.No_Soal || (idx + 1), type = Number(s.Tipe_Soal) || 1;
                 let isCorrect = false;
                 const kunciClean = String(s.Kunci).replace(/\s+/g, '').toUpperCase();
-                
+
                 if (type === 3) {
                     const uAnsStr = Object.values(userAnswers[no]||{}).join('');
                     isCorrect = (uAnsStr === kunciClean);
@@ -1051,32 +1115,95 @@
                     const uAns = String(userAnswers[no] || "").replace(/\s+/g, '').toUpperCase();
                     isCorrect = (uAns === kunciClean);
                 }
-                
+
                 if (isCorrect) correct++;
-                
-                // Render Simple Review Box
-                reviewList.innerHTML += `<div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border ${isCorrect?'border-green-400 bg-green-50/20':'border-red-400 bg-red-50/20'}"><div class="flex justify-between items-center mb-3"><span class="font-bold text-sm md:text-base">No. ${no}</span><span class="font-bold text-xs md:text-sm px-2 py-1 rounded-md ${isCorrect?'text-green-600 bg-green-100':'text-red-600 bg-red-100'}">${isCorrect?'<i class="fas fa-check mr-1"></i> Benar':'<i class="fas fa-times mr-1"></i> Salah'}</span></div><div class="text-xs md:text-sm space-y-1"><p>Jawabanmu: <b>${JSON.stringify(userAnswers[no]||"Kosong")}</b></p><p>Kunci: <b>${s.Kunci}</b></p></div><div class="mt-4 p-3 md:p-4 bg-slate-50 text-[11px] md:text-xs rounded-xl border overflow-x-auto"><b class="text-brand-pink block mb-1">Pembahasan:</b> ${parseInlineImages(s.Pembahasan||"Belum tersedia")}</div></div>`;
+
+                /* Persiapan teks soal dan stimulus untuk ditampilkan di pembahasan */
+                let stim = s.Stimulus ? String(s.Stimulus) : "";
+                stim = stim.includes('[GAMBAR:') ? parseInlineImages(stim) : (stim.trim().startsWith('http') ? `<img src='${stim.trim()}' class='max-w-md w-full mx-auto my-3 rounded-xl border border-slate-200'>` : stim);
+                let soalTeks = s.Pertanyaan ? parseInlineImages(s.Pertanyaan) : "Pernyataan";
+
+                /* Opsi untuk di Review */
+                let optHTMLReview = "";
+                if (type === 3) {
+                    const stmts = [s.Opsi_A, s.Opsi_B, s.Opsi_C].filter(x => x && x !== "-");
+                    optHTMLReview = `<div class="mt-4 overflow-x-auto rounded-xl border border-slate-200"><table class="w-full text-xs md:text-sm text-left"><thead class="bg-slate-100 font-bold text-[10px] uppercase text-slate-600"><tr><th class="p-3">Pernyataan Analisis</th><th class="p-3 text-center w-20">${s.Opsi_D||"Benar"}</th><th class="p-3 text-center w-20">${s.Opsi_E||"Salah"}</th></tr></thead><tbody class="divide-y divide-slate-100">` + stmts.map((st, i) => `<tr><td class="p-3 border-r bg-slate-50/30">${st}</td><td class="p-3 text-center text-slate-300 border-r"><i class="far fa-circle"></i></td><td class="p-3 text-center text-slate-300"><i class="far fa-circle"></i></td></tr>`).join("") + `</tbody></table></div>`;
+                } else if (type === 4) {
+                    optHTMLReview = `<div class="mt-4 overflow-hidden rounded-xl border border-slate-200 max-w-sm"><table class="w-full text-center table-fixed"><thead class="bg-slate-100 font-bold uppercase text-[10px] text-slate-600"><tr><th class="p-2 border-r border-slate-200">Kuantitas P</th><th class="p-2">Kuantitas Q</th></tr></thead><tbody><tr class="divide-x divide-slate-200"><td class="p-3 bg-white font-bold text-brand-pink">${s.Opsi_A}</td><td class="p-3 bg-white font-bold text-brand-pink">${s.Opsi_B}</td></tr></tbody></table></div>`;
+                    optHTMLReview += `<div class="mt-3 space-y-1 text-xs md:text-sm text-slate-600">`;
+                    [{l:'A',t:"Kuantitas P lebih besar dari Q."},{l:'B',t:"Kuantitas P lebih kecil dari Q."},{l:'C',t:"Kuantitas P sama dengan Q."},{l:'D',t:"Informasi tidak cukup untuk memutuskan."}].forEach(c => optHTMLReview += `<div class="flex gap-2"><span class="font-bold text-slate-400">${c.l}.</span><span>${c.t}</span></div>`);
+                    optHTMLReview += `</div>`;
+                } else if (type === 5) {
+                    optHTMLReview = `<div class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs md:text-sm"><div class="flex gap-3"><span class="font-bold text-brand-pink">(1)</span> <span>${s.Opsi_A}</span></div><div class="flex gap-3"><span class="font-bold text-brand-pink">(2)</span> <span>${s.Opsi_B}</span></div></div>`;
+                    optHTMLReview += `<div class="mt-3 space-y-1 text-xs md:text-sm text-slate-600">`;
+                    [{l:'A',t:"(1) SAJA cukup, (2) SAJA tidak cukup."},{l:'B',t:"(2) SAJA cukup, (1) SAJA tidak cukup."},{l:'C',t:"DUA BERSAMA cukup, SATU SAJA tidak cukup."},{l:'D',t:"(1) SAJA cukup, (2) SAJA juga cukup."},{l:'E',t:"(1) dan (2) tidak cukup."}].forEach(c => optHTMLReview += `<div class="flex gap-2"><span class="font-bold text-slate-400">${c.l}.</span><span>${c.t}</span></div>`);
+                    optHTMLReview += `</div>`;
+                } else {
+                    optHTMLReview = `<div class="mt-4 space-y-2">`;
+                    ["A","B","C","D","E"].forEach(l => {
+                        if (s[`Opsi_${l}`] && s[`Opsi_${l}`] !== "-") {
+                            optHTMLReview += `<div class="flex items-start gap-3 text-xs md:text-sm p-2 rounded-lg border border-transparent hover:bg-slate-50"><span class="font-bold text-slate-400 mt-0.5">${l}.</span><span class="flex-1 text-slate-700">${s[`Opsi_${l}`]}</span></div>`;
+                        }
+                    });
+                    optHTMLReview += `</div>`;
+                }
+
+                /* Jawaban User yang dirapikan (hilangkan tanda kutip JSON jika bukan tabel) */
+                let jawabanUserRapi = JSON.stringify(userAnswers[no]||"Kosong").replace(/"/g, '');
+
+                /* Render Box Review Pembahasan */
+                reviewList.innerHTML += `
+                <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border ${isCorrect?'border-green-400 bg-green-50/20':'border-red-400 bg-red-50/20'} mb-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="font-bold text-sm md:text-base">No. ${no}</span>
+                        <span class="font-bold text-xs md:text-sm px-2 py-1 rounded-md ${isCorrect?'text-green-600 bg-green-100':'text-red-600 bg-red-100'}">${isCorrect?'<i class="fas fa-check mr-1"></i> Benar':'<i class="fas fa-times mr-1"></i> Salah'}</span>
+                    </div>
+                    
+                    <!-- BAGIAN SOAL & OPSI -->
+                    <div class="mb-4 p-4 bg-white rounded-xl border border-slate-200 text-xs md:text-sm text-slate-700 shadow-sm overflow-x-auto">
+                        ${stim ? `<div class="mb-3 text-slate-600 leading-relaxed">${stim}</div>` : ''}
+                        <div class="font-bold text-brand-dark leading-relaxed">${soalTeks}</div>
+                        ${optHTMLReview}
+                    </div>
+
+                    <div class="text-xs md:text-sm space-y-1 mb-4 px-1">
+                        <p>Jawabanmu: <b class="text-slate-800">${jawabanUserRapi}</b></p>
+                        <p>Kunci: <b class="text-brand-pink">${s.Kunci}</b></p>
+                    </div>
+
+                    <div class="p-3 md:p-4 bg-slate-50 text-[11px] md:text-xs rounded-xl border border-slate-200 overflow-x-auto">
+                        <b class="text-brand-pink block mb-2"><i class="fas fa-lightbulb mr-1 text-brand-yellow"></i> Pembahasan:</b> 
+                        <div class="text-slate-600 leading-relaxed">${parseInlineImages(s.Pembahasan||"Belum tersedia")}</div>
+                    </div>
+                </div>`;
             });
 
             const finalScore = (isHistoryMode && historyScore !== null) ? historyScore : Math.round((correct / activeQuestions.length) * 100);
             $('final-score').innerText = finalScore;
-            $('history-banner').classList[isHistoryMode ? 'remove' : 'add']('hidden');
+            
+            if (isHistoryMode) {
+                $('history-banner').classList.remove('hidden');
+            } else {
+                $('history-banner').classList.add('hidden');
+            }
 
             if (!isHistoryMode) {
-                // Konversi examMode "KUIS" menjadi "BS" agar tetap masuk log Riwayat Bank Soal dengan mulus
-                const savingMode = (examMode === "TO") ? "TO" : "BS"; 
+                /* Konversi examMode "KUIS" menjadi "BS" agar tetap masuk log Riwayat Bank Soal dengan mulus */
+                const savingMode = (examMode === "TO") ? "TO" : "BS";
                 try {
-                    await fetch(API_URL, { 
-                        method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                        body: JSON.stringify({ 
+                    await fetch(API_URL, {
+                        method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
                             action: "submit_result", type: savingMode,
                             nama: currentUser.Nama, kelas: currentUser.Kelas, sekolah: currentUser.Asal_Sekolah||"-",
-                            kategori: state.kat, mapel: state.mapel, to_ke: state.to_ke, 
+                            kategori: state.kat, mapel: state.mapel, to_ke: state.to_ke,
                             topik: state.topik, subtopik: state.subtopik, level: state.lvl,
-                            skor: finalScore, analisis: analisisTeks, jawaban: userAnswers 
-                        }) 
+                            skor: finalScore, analisis: analisisTeks, jawaban: userAnswers
+                        })
                     });
-                } catch (e) { console.error(e); }
+                } catch (e) { 
+                    console.error(e); 
+                }
             }
 
             $('exam-footer').style.display = 'none';
@@ -1084,11 +1211,13 @@
             navigateTo('result-view');
         }
 
-        function toggleReview() { 
-            const c = $('review-container'); c.classList.toggle('hidden'); 
-            if (!c.classList.contains('hidden')) c.scrollIntoView({ behavior: 'smooth' }); 
-        }
-
+        function toggleReview() {
+             const c = $('review-container'); 
+             c.classList.toggle('hidden');
+             if (!c.classList.contains('hidden')) {
+                 c.scrollIntoView({ behavior: 'smooth' });
+             }
+         }
     </script>
 </body>
 </html>
