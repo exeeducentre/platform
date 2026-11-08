@@ -25,6 +25,9 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- SUPABASE SDK (TAMBAHKAN INI) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -697,8 +700,13 @@
     </main>
 
     <script>
-        /* --- KONFIGURASI API TERBARU --- */
-        const API_URL = "https://script.google.com/macros/s/AKfycbzKtUDceyf2kV0VUre9C9zhXMmJkykwLnLa0FMFxfgmdEjtW5MjeYWkRr9VhizEkMw9/exec";
+        /* --- KONFIGURASI API SUPABASE --- */
+        const SUPABASE_URL = "https://wzqswptykanxhkcqdwju.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6cXN3cHR5a2FueGhrY3Fkd2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MjE4ODksImV4cCI6MjEwNTM5Nzg4OX0.KuRjkdMbq4ksEQ_xEgdHyEFwr7Fzge5FtpowAAxFo8Q";
+        
+        // Inisialisasi Client Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         const $ = id => document.getElementById(id);
         
         const isValidOpsi = (val) => val !== undefined && val !== null && String(val).trim() !== "" && String(val).trim() !== "-";
@@ -766,14 +774,43 @@
             return { icon: 'fa-layer-group', text: 'text-slate-600', bgSoft: 'bg-slate-100', borderHover: 'hover:border-slate-400', bgHover: 'hover:bg-slate-50', bgSolidHover: 'group-hover:bg-slate-600', groupTextHover: 'group-hover:text-slate-600' };
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedSession = localStorage.getItem('exe_current_user');
-            if(savedSession) {
-                try {
-                    currentUser = JSON.parse(savedSession);
-                    setupDashboard(); 
-                } catch(e) { 
-                    localStorage.removeItem('exe_current_user'); 
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Cek session aktif dari Supabase Auth
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            if (session) {
+                // Jika token valid, ambil data profil dari tabel public.users
+                const { data: profile, error: profileError } = await supabase
+                    .from('users')
+                    .select('*, packages(name)') // Join dengan tabel packages
+                    .eq('auth_id', session.user.id)
+                    .single();
+
+                if (profile) {
+                    // Format data profil agar sesuai dengan struktur UI kamu saat ini
+                    currentUser = {
+                        id: profile.id,
+                        Nama: profile.full_name,
+                        Email: profile.email,
+                        Kelas: profile.grade_level,
+                        Asal_Sekolah: profile.school_name || profile.address || "-", // Penyesuaian sementara
+                        Paket: profile.packages ? profile.packages.name : "Reguler"
+                    };
+                    setupDashboard();
+                } else {
+                    // Terjadi anomali, bersihkan session
+                    await supabase.auth.signOut();
+                }
+            } else {
+                // Cek barangkali ada user GUEST di localStorage (Mode Demo)
+                const savedGuest = localStorage.getItem('exe_guest_user');
+                if(savedGuest) {
+                    try {
+                        currentUser = JSON.parse(savedGuest);
+                        setupDashboard(); 
+                    } catch(e) { 
+                        localStorage.removeItem('exe_guest_user'); 
+                    }
                 }
             }
         });
