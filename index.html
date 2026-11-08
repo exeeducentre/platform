@@ -700,15 +700,22 @@
     </main>
 
     <script>
-        /* --- KONFIGURASI API SUPABASE --- */
+        /* ============================================== */
+        /* 1. KONFIGURASI API & SUPABASE SDK              */
+        /* ============================================== */
         const SUPABASE_URL = "https://wzqswptykanxhkcqdwju.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6cXN3cHR5a2FueGhrY3Fkd2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MjE4ODksImV4cCI6MjEwNTM5Nzg4OX0.KuRjkdMbq4ksEQ_xEgdHyEFwr7Fzge5FtpowAAxFo8Q";
         
-        // Inisialisasi Client Supabase
+        // Inisialisasi Client Supabase (Hanya sekali di atas)
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const $ = id => document.getElementById(id);
+        /* ============================================== */
+        /* 2. VARIABEL GLOBAL & UTILITIES                 */
+        /* ============================================== */
+        // Konstanta lama biarkan untuk jaga-jaga kalau masih ada sisa kode GAS
+        const API_URL = "https://script.google.com/macros/s/AKfycbzKtUDceyf2kV0VUre9C9zhXMmJkykwLnLa0FMFxfgmdEjtW5MjeYWkRr9VhizEkMw9/exec";
         
+        const $ = id => document.getElementById(id);
         const isValidOpsi = (val) => val !== undefined && val !== null && String(val).trim() !== "" && String(val).trim() !== "-";
 
         /* SECURITY DASAR (Menonaktifkan Klik Kanan) */
@@ -745,35 +752,8 @@
         });
 
         /* ============================================== */
-        /* SMART ICONS & COLORS LOGIC                     */
+        /* 3. INITIALIZATION (CEK LOGIN SAAT HALAMAN DIBUKA)*/
         /* ============================================== */
-        function getSmartStyle(name) {
-            if (!name) return { icon: 'fa-folder-open', text: 'text-slate-500', bgSoft: 'bg-slate-100', borderHover: 'hover:border-slate-400', bgHover: 'hover:bg-slate-50', bgSolidHover: 'group-hover:bg-slate-500', groupTextHover: 'group-hover:text-slate-600' };
-            
-            const str = String(name).toLowerCase();
-            
-            if (str.match(/matematika|kuantitatif|mtk|aljabar|angka|penalaran|bilangan|geometri|eksponen|fungsi/)) 
-                return { icon: 'fa-calculator', text: 'text-brand-blue', bgSoft: 'bg-blue-50', borderHover: 'hover:border-brand-blue', bgHover: 'hover:bg-blue-50', bgSolidHover: 'group-hover:bg-brand-blue', groupTextHover: 'group-hover:text-brand-blue' };
-            
-            if (str.match(/biologi|sel|genetika|anatomi|tumbuh|makhluk/)) 
-                return { icon: 'fa-dna', text: 'text-brand-emerald', bgSoft: 'bg-emerald-50', borderHover: 'hover:border-brand-emerald', bgHover: 'hover:bg-emerald-50', bgSolidHover: 'group-hover:bg-brand-emerald', groupTextHover: 'group-hover:text-brand-emerald' };
-            if (str.match(/kimia|reaksi|atom|unsur/)) 
-                return { icon: 'fa-flask', text: 'text-brand-emerald', bgSoft: 'bg-emerald-50', borderHover: 'hover:border-brand-emerald', bgHover: 'hover:bg-emerald-50', bgSolidHover: 'group-hover:bg-brand-emerald', groupTextHover: 'group-hover:text-brand-emerald' };
-            if (str.match(/fisika|ipas|sains|ipa|mekanika|dinamika|kinematika|gerak|energi|besaran|dimensi/)) 
-                return { icon: 'fa-rocket', text: 'text-brand-emerald', bgSoft: 'bg-emerald-50', borderHover: 'hover:border-brand-emerald', bgHover: 'hover:bg-emerald-50', bgSolidHover: 'group-hover:bg-brand-emerald', groupTextHover: 'group-hover:text-brand-emerald' };
-                
-            if (str.match(/bahasa|literasi|indonesia|inggris|reading|teks|bacaan|majas|wacana/)) 
-                return { icon: 'fa-book-open', text: 'text-brand-pink', bgSoft: 'bg-pink-50', borderHover: 'hover:border-brand-pink', bgHover: 'hover:bg-pink-50', bgSolidHover: 'group-hover:bg-brand-pink', groupTextHover: 'group-hover:text-brand-pink' };
-                
-            if (str.match(/sejarah|ips|sosio|geografi|ekonomi|bumi|masyarakat|pkn/)) 
-                return { icon: 'fa-globe-americas', text: 'text-brand-orange', bgSoft: 'bg-orange-50', borderHover: 'hover:border-brand-orange', bgHover: 'hover:bg-orange-50', bgSolidHover: 'group-hover:bg-brand-orange', groupTextHover: 'group-hover:text-brand-orange' };
-                
-            if (str.match(/informatika|komputer|tik|koding|potensi|kognitif|logika|nalar|snbt|tka|utbk/)) 
-                return { icon: 'fa-brain', text: 'text-brand-purple', bgSoft: 'bg-purple-50', borderHover: 'hover:border-brand-purple', bgHover: 'hover:bg-purple-50', bgSolidHover: 'group-hover:bg-brand-purple', groupTextHover: 'group-hover:text-brand-purple' };
-                
-            return { icon: 'fa-layer-group', text: 'text-slate-600', bgSoft: 'bg-slate-100', borderHover: 'hover:border-slate-400', bgHover: 'hover:bg-slate-50', bgSolidHover: 'group-hover:bg-slate-600', groupTextHover: 'group-hover:text-slate-600' };
-        }
-
         window.addEventListener('DOMContentLoaded', async () => {
             // Cek session aktif dari Supabase Auth
             const { data: { session }, error } = await supabase.auth.getSession();
@@ -782,23 +762,25 @@
                 // Jika token valid, ambil data profil dari tabel public.users
                 const { data: profile, error: profileError } = await supabase
                     .from('users')
-                    .select('*, packages(name)') // Join dengan tabel packages
+                    .select('*, packages(name)') 
                     .eq('auth_id', session.user.id)
                     .single();
 
                 if (profile) {
-                    // Format data profil agar sesuai dengan struktur UI kamu saat ini
+                    // Format data profil agar sesuai dengan struktur UI
                     currentUser = {
                         id: profile.id,
                         Nama: profile.full_name,
                         Email: profile.email,
                         Kelas: profile.grade_level,
-                        Asal_Sekolah: profile.school_name || profile.address || "-", // Penyesuaian sementara
-                        Paket: profile.packages ? profile.packages.name : "Reguler"
+                        Asal_Sekolah: profile.school_name || profile.address || "-",
+                        Paket: profile.packages ? profile.packages.name : "Reguler",
+                        // Simpan id paket untuk pengecekan akses fitur nantinya
+                        Package_id: profile.package_id 
                     };
                     setupDashboard();
                 } else {
-                    // Terjadi anomali, bersihkan session
+                    // Terjadi anomali (user dihapus di DB tapi session msh ada)
                     await supabase.auth.signOut();
                 }
             } else {
@@ -814,6 +796,175 @@
                 }
             }
         });
+
+        /* ============================================== */
+        /* 4. LOGIN & AUTHENTICATION (SUPABASE)           */
+        /* ============================================== */
+        async function prosesLogin() {
+            const email = $('input-email').value.trim();
+            const password = $('input-password').value;
+            const feedback = $('login-feedback');
+
+            if(!email || !password) { 
+                feedback.innerText = "Email dan password wajib diisi."; 
+                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
+                feedback.classList.remove('hidden'); 
+                return; 
+            }
+
+            const btn = $('btn-proses-login'); 
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Mengecek..."; 
+            btn.disabled = true;
+            
+            try {
+                // 1. Eksekusi Login via Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
+                });
+
+                if (authError) throw authError;
+
+                // 2. Ambil Profil Lengkap dari tabel public.users
+                const { data: profile, error: profileError } = await supabase
+                    .from('users')
+                    .select('*, packages(name)') 
+                    .eq('auth_id', authData.user.id)
+                    .single();
+
+                if (profileError || !profile) {
+                    throw new Error("Gagal mengambil data profil siswa.");
+                }
+
+                // 3. Set Current User & Buka Dashboard
+                currentUser = {
+                    id: profile.id,
+                    Nama: profile.full_name,
+                    Email: profile.email,
+                    Kelas: profile.grade_level,
+                    Asal_Sekolah: profile.school_name || profile.address || "-",
+                    Paket: profile.packages ? profile.packages.name : "Reguler",
+                    Package_id: profile.package_id
+                };
+                
+                feedback.classList.add('hidden'); 
+                $('input-password').value = "";
+                setupDashboard(); 
+
+            } catch(err) {
+                feedback.innerText = err.message || "Email atau password salah."; 
+                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
+                feedback.classList.remove('hidden');
+            } finally { 
+                btn.innerHTML = 'Masuk Dashboard'; 
+                btn.disabled = false; 
+            }
+        }
+
+        async function doLogout() {
+            // Logout dari Supabase
+            await supabase.auth.signOut();
+            
+            currentUser = null; 
+            localStorage.removeItem('exe_guest_user'); // Hapus guest jika ada
+            
+            $('main-nav').classList.add('hidden'); 
+            $('input-email').value = ""; 
+            $('input-password').value = "";
+            toggleGuestForm(false); 
+            navigateTo('auth-view');
+        }
+
+        async function prosesGantiPassword() {
+            const oldPass = $('old-password').value; 
+            const newPass = $('new-password').value; 
+            const confirmPass = $('confirm-password').value;
+            const feedback = $('password-feedback');
+
+            if (!oldPass || !newPass || !confirmPass) {
+                feedback.innerText = "Semua kolom wajib diisi!"; 
+                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
+                feedback.classList.remove('hidden'); 
+                return;
+            }
+            if (newPass !== confirmPass) {
+                feedback.innerText = "Password baru dan konfirmasi tidak cocok!"; 
+                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
+                feedback.classList.remove('hidden'); 
+                return;
+            }
+
+            const btn = $('btn-save-password'); 
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Memproses..."; 
+            btn.disabled = true;
+            
+            try {
+                // Di Supabase, kita memanggil update user untuk ganti password.
+                // Note: user harus dalam keadaan login untuk melakukan ini.
+                const { data, error } = await supabase.auth.updateUser({
+                  password: newPass
+                });
+
+                if (error) throw error;
+                
+                feedback.innerText = "Password berhasil diubah!"; 
+                feedback.className = "text-sm text-center font-bold mb-4 text-green-600"; 
+                feedback.classList.remove('hidden');
+                
+                setTimeout(() => { 
+                    closePasswordModal(); 
+                    showModal("Berhasil!", "Password Anda berhasil diperbarui.", "<i class='fas fa-check-circle text-green-500'></i>"); 
+                }, 1500);
+
+            } catch (err) {
+                feedback.innerText = err.message || 'Gagal mengubah password.'; 
+                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
+                feedback.classList.remove('hidden');
+            } finally { 
+                btn.innerHTML = 'Simpan'; 
+                btn.disabled = false; 
+            }
+        }
+
+        async function prosesLoginGuest() {
+            const nama = $('guest-nama').value.trim(); const email = $('guest-email').value.trim(); const telepon = $('guest-wa').value.trim();
+            const sekolah = $('guest-sekolah').value.trim(); const kelas = $('guest-kelas').value.trim(); const kota = $('guest-kota').value.trim();
+
+            if(!nama || !email || !telepon || !sekolah || !kelas || !kota) {
+                showModal("Perhatian", "Mohon lengkapi seluruh form data diri untuk melanjutkan.", "<i class='fas fa-exclamation-triangle text-brand-orange'></i>"); return;
+            }
+
+            const btn = $('btn-proses-guest'); const oldText = btn.innerHTML; btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Mendaftarkan..."; btn.disabled = true;
+            try {
+                // Untuk guest, kita simpan di tabel trial_registrations Supabase
+                const { error } = await supabase.from('trial_registrations').insert({
+                    full_name: nama,
+                    phone_number: telepon,
+                    school_name: sekolah,
+                    grade_level: kelas,
+                    subject: 'Campuran', // Default demo
+                    trial_date: new Date().toISOString().split('T')[0],
+                    status: 'menunggu konfirmasi'
+                });
+
+                if(error) throw error;
+                
+                currentUser = { Nama: nama, Email: email, Kelas: "GUEST", Paket: "GUEST", Asal_Sekolah: sekolah };
+                localStorage.setItem('exe_guest_user', JSON.stringify(currentUser));
+                setupDashboard();
+            } catch(err) { 
+                showModal("Error", "Gagal mendaftar sebagai tamu. Cek jaringan Anda.", "<i class='fas fa-wifi text-red-500'></i>"); 
+            } finally { 
+                btn.innerHTML = oldText; btn.disabled = false; 
+            }
+        }
+
+        function setupDashboard() {
+            const namaDepan = currentUser.Nama.split(' ')[0];
+            $('display-nama').innerText = namaDepan; $('dash-nama').innerText = namaDepan;
+            $('main-nav').classList.remove('hidden');
+            navigateTo('dashboard-view');
+        }
 
         /* ============================================== */
         /* UI UTILITIES & MODAL                           */
@@ -838,34 +989,35 @@
         }
         function closePasswordModal() { $('password-modal').classList.add('hidden'); }
 
-        async function prosesGantiPassword() {
-            const oldPass = $('old-password').value; const newPass = $('new-password').value; const confirmPass = $('confirm-password').value;
-            const feedback = $('password-feedback');
+        /* ============================================== */
+        /* SMART ICONS & COLORS LOGIC                     */
+        /* ============================================== */
+        function getSmartStyle(name) {
+            if (!name) return { icon: 'fa-folder-open', text: 'text-slate-500', bgSoft: 'bg-slate-100', borderHover: 'hover:border-slate-400', bgHover: 'hover:bg-slate-50', bgSolidHover: 'group-hover:bg-slate-500', groupTextHover: 'group-hover:text-slate-600' };
+            const str = String(name).toLowerCase();
+            if (str.match(/matematika|kuantitatif|mtk|aljabar|angka|penalaran|bilangan|geometri|eksponen|fungsi/)) 
+                return { icon: 'fa-calculator', text: 'text-brand-blue', bgSoft: 'bg-blue-50', borderHover: 'hover:border-brand-blue', bgHover: 'hover:bg-blue-50', bgSolidHover: 'group-hover:bg-brand-blue', groupTextHover: 'group-hover:text-brand-blue' };
+            if (str.match(/biologi|sel|genetika|anatomi|tumbuh|makhluk/)) 
+                return { icon: 'fa-dna', text: 'text-brand-emerald', bgSoft: 'bg-emerald-50', borderHover: 'hover:border-brand-emerald', bgHover: 'hover:bg-emerald-50', bgSolidHover: 'group-hover:bg-brand-emerald', groupTextHover: 'group-hover:text-brand-emerald' };
+            if (str.match(/kimia|reaksi|atom|unsur/)) 
+                return { icon: 'fa-flask', text: 'text-brand-emerald', bgSoft: 'bg-emerald-50', borderHover: 'hover:border-brand-emerald', bgHover: 'hover:bg-emerald-50', bgSolidHover: 'group-hover:bg-brand-emerald', groupTextHover: 'group-hover:text-brand-emerald' };
+            if (str.match(/fisika|ipas|sains|ipa|mekanika|dinamika|kinematika|gerak|energi|besaran|dimensi/)) 
+                return { icon: 'fa-rocket', text: 'text-brand-emerald', bgSoft: 'bg-emerald-50', borderHover: 'hover:border-brand-emerald', bgHover: 'hover:bg-emerald-50', bgSolidHover: 'group-hover:bg-brand-emerald', groupTextHover: 'group-hover:text-brand-emerald' };
+            if (str.match(/bahasa|literasi|indonesia|inggris|reading|teks|bacaan|majas|wacana/)) 
+                return { icon: 'fa-book-open', text: 'text-brand-pink', bgSoft: 'bg-pink-50', borderHover: 'hover:border-brand-pink', bgHover: 'hover:bg-pink-50', bgSolidHover: 'group-hover:bg-brand-pink', groupTextHover: 'group-hover:text-brand-pink' };
+            if (str.match(/sejarah|ips|sosio|geografi|ekonomi|bumi|masyarakat|pkn/)) 
+                return { icon: 'fa-globe-americas', text: 'text-brand-orange', bgSoft: 'bg-orange-50', borderHover: 'hover:border-brand-orange', bgHover: 'hover:bg-orange-50', bgSolidHover: 'group-hover:bg-brand-orange', groupTextHover: 'group-hover:text-brand-orange' };
+            if (str.match(/informatika|komputer|tik|koding|potensi|kognitif|logika|nalar|snbt|tka|utbk/)) 
+                return { icon: 'fa-brain', text: 'text-brand-purple', bgSoft: 'bg-purple-50', borderHover: 'hover:border-brand-purple', bgHover: 'hover:bg-purple-50', bgSolidHover: 'group-hover:bg-brand-purple', groupTextHover: 'group-hover:text-brand-purple' };
+            return { icon: 'fa-layer-group', text: 'text-slate-600', bgSoft: 'bg-slate-100', borderHover: 'hover:border-slate-400', bgHover: 'hover:bg-slate-50', bgSolidHover: 'group-hover:bg-slate-600', groupTextHover: 'group-hover:text-slate-600' };
+        }
 
-            if (!oldPass || !newPass || !confirmPass) {
-                feedback.innerText = "Semua kolom wajib diisi!"; feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; feedback.classList.remove('hidden'); return;
+        function toggleGuestForm(showGuest) {
+            if(showGuest) {
+                $('login-form-container').classList.add('hidden'); $('guest-form-container').classList.remove('hidden');
+            } else {
+                $('guest-form-container').classList.add('hidden'); $('login-form-container').classList.remove('hidden');
             }
-            if (newPass !== confirmPass) {
-                feedback.innerText = "Password baru dan konfirmasi tidak cocok!"; feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; feedback.classList.remove('hidden'); return;
-            }
-
-            const btn = $('btn-save-password'); btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Memproses..."; btn.disabled = true;
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: "change_password", email: currentUser.Email, old_password: oldPass, new_password: newPass })
-                });
-                const result = await response.json();
-                if (result.status === "success") {
-                    feedback.innerText = result.message; feedback.className = "text-sm text-center font-bold mb-4 text-green-600"; feedback.classList.remove('hidden');
-                    currentUser.Password = newPass; localStorage.setItem('exe_current_user', JSON.stringify(currentUser));
-                    setTimeout(() => { closePasswordModal(); showModal("Berhasil!", "Password Anda berhasil diperbarui.", "<i class='fas fa-check-circle text-green-500'></i>"); }, 1500);
-                } else {
-                    feedback.innerText = result.message || "Gagal mengubah password."; feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; feedback.classList.remove('hidden');
-                }
-            } catch (err) {
-                feedback.innerText = 'Koneksi terputus. Silakan coba lagi.'; feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; feedback.classList.remove('hidden');
-            } finally { btn.innerHTML = 'Simpan'; btn.disabled = false; }
         }
 
         /* --------------------------------------------------------- */
@@ -994,118 +1146,6 @@
                 if (wibNow > endDate) return "FINISHED";
             } catch(e) { return "UNKNOWN"; }
             return "UNKNOWN";
-        }
-
-        /* ============================================== */
-        /* LOGIN & AUTHENTICATION                         */
-        /* ============================================== */
-        function toggleGuestForm(showGuest) {
-            if(showGuest) {
-                $('login-form-container').classList.add('hidden'); $('guest-form-container').classList.remove('hidden');
-            } else {
-                $('guest-form-container').classList.add('hidden'); $('login-form-container').classList.remove('hidden');
-            }
-        }
-
-        async function prosesLogin() {
-            const email = $('input-email').value.trim();
-            const password = $('input-password').value;
-            const feedback = $('login-feedback');
-
-            if(!email || !password) { 
-                feedback.innerText = "Email dan password wajib diisi."; 
-                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
-                feedback.classList.remove('hidden'); 
-                return; 
-            }
-
-            const btn = $('btn-proses-login'); 
-            btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Mengecek..."; 
-            btn.disabled = true;
-            
-            try {
-                // 1. Eksekusi Login via Supabase Auth
-                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
-
-                if (authError) {
-                    throw authError;
-                }
-
-                // 2. Ambil Profil Lengkap dari tabel public.users
-                const { data: profile, error: profileError } = await supabase
-                    .from('users')
-                    .select('*, packages(name)') // Ambil juga nama paket langganannya
-                    .eq('auth_id', authData.user.id)
-                    .single();
-
-                if (profileError || !profile) {
-                    throw new Error("Gagal mengambil data profil siswa.");
-                }
-
-                // 3. Simpan Session untuk Navigasi (Sesuai format kode lama kamu)
-                currentUser = {
-                    id: profile.id,
-                    Nama: profile.full_name,
-                    Email: profile.email,
-                    Kelas: profile.grade_level,
-                    Asal_Sekolah: profile.school_name || profile.address || "-",
-                    Paket: profile.packages ? profile.packages.name : "Reguler"
-                };
-                
-                // Simpan ke localStorage buat jaga-jaga kalau page direfresh
-                localStorage.setItem('exe_current_user', JSON.stringify(currentUser)); 
-                
-                feedback.classList.add('hidden'); 
-                $('input-password').value = "";
-                setupDashboard(); // Buka halaman dashboard
-
-            } catch(err) {
-                feedback.innerText = err.message || "Email atau password salah."; 
-                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
-                feedback.classList.remove('hidden');
-            } finally { 
-                btn.innerHTML = 'Masuk Dashboard'; 
-                btn.disabled = false; 
-            }
-        }
-
-        async function prosesLoginGuest() {
-            const nama = $('guest-nama').value.trim(); const email = $('guest-email').value.trim(); const telepon = $('guest-wa').value.trim();
-            const sekolah = $('guest-sekolah').value.trim(); const kelas = $('guest-kelas').value.trim(); const kota = $('guest-kota').value.trim();
-
-            if(!nama || !email || !telepon || !sekolah || !kelas || !kota) {
-                showModal("Perhatian", "Mohon lengkapi seluruh form data diri untuk melanjutkan.", "<i class='fas fa-exclamation-triangle text-brand-orange'></i>"); return;
-            }
-
-            const btn = $('btn-proses-guest'); const oldText = btn.innerHTML; btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Mendaftarkan..."; btn.disabled = true;
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: "register_guest", nama: nama, email: email, telepon: telepon, sekolah: sekolah, kelas: kelas, kota: kota })
-                });
-                const result = await response.json();
-                if(result.status === "success") {
-                    currentUser = { Nama: nama, Email: email, Kelas: "GUEST", Paket: "GUEST", Asal_Sekolah: sekolah };
-                    localStorage.setItem('exe_current_user', JSON.stringify(currentUser));
-                    setupDashboard();
-                } else { showModal("Gagal", result.message || "Gagal masuk sebagai tamu.", "<i class='fas fa-times text-red-500'></i>"); }
-            } catch(err) { showModal("Error", "Koneksi gagal. Cek jaringan Anda.", "<i class='fas fa-wifi text-red-500'></i>"); } finally { btn.innerHTML = oldText; btn.disabled = false; }
-        }
-
-        function setupDashboard() {
-            const namaDepan = currentUser.Nama.split(' ')[0];
-            $('display-nama').innerText = namaDepan; $('dash-nama').innerText = namaDepan;
-            $('main-nav').classList.remove('hidden');
-            navigateTo('dashboard-view');
-        }
-
-        function doLogout() {
-            currentUser = null; localStorage.removeItem('exe_current_user'); 
-            $('main-nav').classList.add('hidden'); $('input-email').value = ""; $('input-password').value = "";
-            toggleGuestForm(false); navigateTo('auth-view');
         }
 
         /* ============================================== */
