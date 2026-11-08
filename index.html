@@ -1013,27 +1013,63 @@
             const feedback = $('login-feedback');
 
             if(!email || !password) { 
-                feedback.innerText = "Email dan password wajib diisi."; feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; feedback.classList.remove('hidden'); return; 
+                feedback.innerText = "Email dan password wajib diisi."; 
+                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
+                feedback.classList.remove('hidden'); 
+                return; 
             }
 
-            const btn = $('btn-proses-login'); btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Mengecek..."; btn.disabled = true;
+            const btn = $('btn-proses-login'); 
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Mengecek..."; 
+            btn.disabled = true;
+            
             try {
-                const response = await fetch(API_URL, {
-                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: "login", email: email, password: password })
+                // 1. Eksekusi Login via Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password,
                 });
-                const result = await response.json();
-                if(result.status === "success") {
-                    currentUser = result.data.user;
-                    localStorage.setItem('exe_current_user', JSON.stringify(currentUser)); 
-                    feedback.classList.add('hidden'); $('input-password').value = "";
-                    setupDashboard();
-                } else {
-                    feedback.innerText = result.message || "Email atau password salah."; feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; feedback.classList.remove('hidden');
+
+                if (authError) {
+                    throw authError;
                 }
+
+                // 2. Ambil Profil Lengkap dari tabel public.users
+                const { data: profile, error: profileError } = await supabase
+                    .from('users')
+                    .select('*, packages(name)') // Ambil juga nama paket langganannya
+                    .eq('auth_id', authData.user.id)
+                    .single();
+
+                if (profileError || !profile) {
+                    throw new Error("Gagal mengambil data profil siswa.");
+                }
+
+                // 3. Simpan Session untuk Navigasi (Sesuai format kode lama kamu)
+                currentUser = {
+                    id: profile.id,
+                    Nama: profile.full_name,
+                    Email: profile.email,
+                    Kelas: profile.grade_level,
+                    Asal_Sekolah: profile.school_name || profile.address || "-",
+                    Paket: profile.packages ? profile.packages.name : "Reguler"
+                };
+                
+                // Simpan ke localStorage buat jaga-jaga kalau page direfresh
+                localStorage.setItem('exe_current_user', JSON.stringify(currentUser)); 
+                
+                feedback.classList.add('hidden'); 
+                $('input-password').value = "";
+                setupDashboard(); // Buka halaman dashboard
+
             } catch(err) {
-                feedback.innerText = "Koneksi gagal. Cek jaringan Anda."; feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; feedback.classList.remove('hidden');
-            } finally { btn.innerHTML = 'Masuk Dashboard'; btn.disabled = false; }
+                feedback.innerText = err.message || "Email atau password salah."; 
+                feedback.className = "text-sm text-center font-bold mb-4 text-red-500"; 
+                feedback.classList.remove('hidden');
+            } finally { 
+                btn.innerHTML = 'Masuk Dashboard'; 
+                btn.disabled = false; 
+            }
         }
 
         async function prosesLoginGuest() {
