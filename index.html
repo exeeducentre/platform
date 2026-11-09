@@ -576,12 +576,13 @@
         /* ============================================== */
         const SUPABASE_URL = "https://wzqswptykanxhkcqdwju.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6cXN3cHR5a2FueGhrY3Fkd2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MjE4ODksImV4cCI6MjEwNTM5Nzg4OX0.KuRjkdMbq4ksEQ_xEgdHyEFwr7Fzge5FtpowAAxFo8Q";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // PERBAIKAN: Ubah nama variabel menjadi 'client' agar tidak bentrok dengan CDN
+        const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         /* ============================================== */
         /* 2. VARIABEL GLOBAL & UTILITIES                 */
         /* ============================================== */
-        // API_URL lama (buat fallback fungsi yang belum migrasi)
         const API_URL = "https://script.google.com/macros/s/AKfycbzKtUDceyf2kV0VUre9C9zhXMmJkykwLnLa0FMFxfgmdEjtW5MjeYWkRr9VhizEkMw9/exec";
         
         const $ = id => document.getElementById(id);
@@ -619,10 +620,11 @@
         /* 3. INITIALIZATION (CEK LOGIN & SESSION)        */
         /* ============================================== */
         window.addEventListener('DOMContentLoaded', async () => {
-            const { data: { session } } = await supabase.auth.getSession();
+            // Gunakan 'client'
+            const { data: { session } } = await client.auth.getSession();
             
             if (session) {
-                const { data: profile, error: profileError } = await supabase
+                const { data: profile, error: profileError } = await client
                     .from('users')
                     .select('*, packages(name)') 
                     .eq('auth_id', session.user.id)
@@ -640,7 +642,7 @@
                     };
                     setupDashboard();
                 } else {
-                    await supabase.auth.signOut();
+                    await client.auth.signOut();
                 }
             } else {
                 const savedGuest = localStorage.getItem('exe_guest_user');
@@ -675,14 +677,14 @@
             btn.disabled = true;
             
             try {
-                const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                const { data: authData, error: authError } = await client.auth.signInWithPassword({
                     email: email,
                     password: password,
                 });
 
                 if (authError) throw authError;
 
-                const { data: profile, error: profileError } = await supabase
+                const { data: profile, error: profileError } = await client
                     .from('users')
                     .select('*, packages(name)') 
                     .eq('auth_id', authData.user.id)
@@ -717,7 +719,7 @@
         }
 
         async function doLogout() {
-            await supabase.auth.signOut();
+            await client.auth.signOut();
             currentUser = null; 
             localStorage.removeItem('exe_guest_user');
             $('main-nav').classList.add('hidden'); 
@@ -747,7 +749,7 @@
             const btn = $('btn-save-password'); btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Memproses..."; btn.disabled = true;
             
             try {
-                const { data, error } = await supabase.auth.updateUser({ password: newPass });
+                const { data, error } = await client.auth.updateUser({ password: newPass });
                 if (error) throw error;
                 
                 feedback.innerText = "Password berhasil diubah!"; 
@@ -785,7 +787,7 @@
 
             const btn = $('btn-proses-guest'); const oldText = btn.innerHTML; btn.innerHTML = "<i class='fas fa-spinner fa-spin mr-2'></i> Mendaftarkan..."; btn.disabled = true;
             try {
-                const { error } = await supabase.from('trial_registrations').insert({
+                const { error } = await client.from('trial_registrations').insert({
                     full_name: nama, phone_number: telepon, school_name: sekolah, grade_level: kelas,
                     subject: 'Campuran', trial_date: new Date().toISOString().split('T')[0], status: 'menunggu konfirmasi'
                 });
