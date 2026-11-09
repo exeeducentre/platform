@@ -940,15 +940,55 @@
             if (!currentUser || currentUser.Kelas === "GUEST") {
                 showModal("Akses Terbatas", "Mode tamu tidak menyimpan riwayat progres permanen.", "<i class='fas fa-lock text-brand-pink'></i>"); return;
             }
+            
             navigateTo('progress-view');
-            showLoading("Memuat Analitik", "Menarik data rapormu dari server...");
+            showLoading("Memuat Analitik", "Menarik data rapormu dari Supabase...");
+            
             try {
-                let res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "get_my_progress", nama: currentUser.Nama }) });
-                let result = await res.json();
-                if (result.status === "success") { globalProgressData = result.data; renderProgressData(); } else { throw new Error(result.message); }
-            } catch (e) { globalProgressData = { tryout: [], latihan: [] }; renderProgressData(); } finally { hideLoading(); }
-        }
+                const { data, error } = await client
+                    .from('exam_results')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: true }); 
 
+                if (error) throw error;
+
+                const toData = [];
+                const bsData = [];
+
+                if (data && data.length > 0) {
+                    data.forEach(r => {
+                        const mappedRow = {
+                            Skor_Akhir: r.score, // Ambil dari kolom 'score'
+                            Jawaban_Raw: JSON.stringify(r.answers_raw || {}), // Ambil dari kolom 'answers_raw'
+                            Timestamp: r.created_at,
+                            Kategori: r.exam_type, // Fallback pakai exam_type karena kolom category ga ada
+                            Mapel: r.subject,
+                            Topik: r.topic,
+                            Subtopik: r.topic, // Fallback karena kolom subtopic ga ada
+                            To_Ke: 1 // Hardcode sementara karena kolom set_code ga ada
+                        };
+
+                        if (r.exam_type === 'TO') {
+                            toData.push(mappedRow);
+                        } else {
+                            bsData.push(mappedRow);
+                        }
+                    });
+                }
+
+                globalProgressData = { tryout: toData, latihan: bsData }; 
+                renderProgressData(); 
+                
+            } catch (e) { 
+                console.error("Gagal tarik analitik:", e);
+                globalProgressData = { tryout: [], latihan: [] }; 
+                renderProgressData(); 
+            } finally { 
+                hideLoading(); 
+            }
+        }
+        
         function renderProgressData() {
             const toData = globalProgressData.tryout || []; const bsData = globalProgressData.latihan || [];
             let avgTO = 0, sumTO = 0;
@@ -1567,20 +1607,35 @@
             if (isHistoryMode) $('history-banner').classList.remove('hidden'); else $('history-banner').classList.add('hidden');
 
             // --- Note: Bagian pengiriman data/menyimpan skor ini sementara masih kita biarkan nembak ke Google Script ---
+            // --- SIMPAN SKOR KE SUPABASE ---
+            // --- SIMPAN SKOR KE SUPABASE ---
             if (!isHistoryMode) {
-                const actionSubmit = (currentUser.Kelas === "GUEST") ? "submit_result_demo" : "submit_result";
                 const savingMode = (examMode === "TO") ? "TO" : "BS";
                 
-                let payloadData = {};
-                if(actionSubmit === "submit_result_demo") {
-                    payloadData = { nama: currentUser.Nama, wa: currentUser.WhatsApp||"-", email: currentUser.Email, sekolah: currentUser.Asal_Sekolah, kelas: currentUser.Kelas, mapel: state.mapel, skor: numericScoreToSubmit, durasi: "Selesai Demo" };
-                } else {
-                    payloadData = { type: savingMode, nama: currentUser.Nama, kelas: currentUser.Kelas, sekolah: currentUser.Asal_Sekolah||"-", kategori: state.kat, mapel: state.mapel, to_ke: state.to_ke, topik: state.topik, subtopik: state.subtopik, level: state.lvl, skor: numericScoreToSubmit, analisis: "Selesai", jawaban: userAnswers };
+                // Kalau Guest (Tamu), kita tidak simpan nilainya ke database utama
+                if (currentUser.Kelas !== "GUEST") {
+                    try {
+                        const { error } = await client
+                            .from('exam_results')
+                            .insert({
+                                user_id: currentUser.id, 
+                                exam_type: savingMode,
+                                subject: state.mapel || "Campuran",
+                                topic: state.topik || "Materi Umum",
+                                total_questions: activeQuestions.length,
+                                correct_answers: correctCount,
+                                score: numericScoreToSubmit,
+                                answers_raw: userAnswers // Simpan JSON jawaban user ke answers_raw
+                                // Catatan: Kolom set_code, category, subtopic tidak ada di tabelmu
+                                // Kolom duration dan notes kita kosongkan dulu karena belum ada variabelnya di frontend
+                            });
+                            
+                        if (error) throw error;
+                        console.log("Rapor berhasil disimpan ke Supabase!");
+                    } catch (e) { 
+                        console.error("Gagal menyimpan rapor:", e); 
+                    }
                 }
-
-                try {
-                    await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: actionSubmit, ...(actionSubmit==="submit_result_demo" ? {data: payloadData} : payloadData) }) });
-                } catch (e) { console.error(e); }
             }
 
             triggerMath(reviewList);
