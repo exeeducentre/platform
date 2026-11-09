@@ -1106,11 +1106,47 @@
         }
 
         async function initBankSoal() {
-            examMode = "BS"; showLoading("Memuat Bank Soal", "Menarik peta materi...");
+            examMode = "BS"; 
+            showLoading("Memuat Bank Soal", "Menarik peta materi dari database...");
+            
             try {
-                const response = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "get_bank_soal_menu", kelas: currentUser.Kelas }) });
-                const result = await response.json(); currentMenuTree = result.data || {}; renderMenu1_BS();
-            } catch(e) { showModal("Gagal", "Gagal memuat Bank Soal.", "<i class='fas fa-times text-red-500'></i>"); } finally { hideLoading(); }
+                // Tarik data menggunakan nama kolom CSV yang baru (huruf kecil & Inggris)
+                const { data, error } = await client
+                    .from('questions')
+                    .select('subject, topic, subtopic, difficulty_level');
+
+                if (error) throw error;
+
+                let menuTree = {};
+                
+                // Susun ulang datanya jadi menu dinamis
+                if (data && data.length > 0) {
+                    data.forEach(q => {
+                        const m = q.subject || "Campuran";
+                        const t = q.topic || "Materi Umum";
+                        const st = q.subtopic || "Subtopik Umum";
+                        const lvl = q.difficulty_level || "REGULER";
+
+                        if (!menuTree[m]) menuTree[m] = {};
+                        if (!menuTree[m][t]) menuTree[m][t] = {};
+                        if (!menuTree[m][t][st]) menuTree[m][t][st] = [];
+                        
+                        // Cegah level duplikat di menu
+                        if (!menuTree[m][t][st].includes(lvl)) {
+                            menuTree[m][t][st].push(lvl);
+                        }
+                    });
+                }
+
+                currentMenuTree = menuTree; 
+                renderMenu1_BS();
+
+            } catch(e) { 
+                console.error(e);
+                showModal("Gagal", "Gagal memuat Bank Soal.", "<i class='fas fa-times text-red-500'></i>"); 
+            } finally { 
+                hideLoading(); 
+            }
         }
 
         function renderMenu1_BS() {
@@ -1152,12 +1188,38 @@
 
         async function executeBankSoal() {
             if(!state.lvl) { showModal("Peringatan", "Pilih level kesulitan dulu ya!"); return; }
-            state.qty = $('bs-jumlah').value; showLoading("Membuat Paket Latihan", "Mengambil soal secara acak...");
+            state.qty = $('bs-jumlah').value; 
+            showLoading("Membuat Paket Latihan", "Mengambil soal spesifik dari Supabase...");
+            
             try {
-                let res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "get_bank_soal_questions", kelas: currentUser.Kelas, mapel: state.mapel, topik: state.topik, subtopik: state.subtopik, level: state.lvl, qty: state.qty }) });
-                let qData = await res.json();
-                if(qData.status === "found") { activeQuestions = qData.data; $('exam-title-text').innerText = `Latihan: ${state.subtopik}`; userAnswers = {}; startExamEngine(); } else { renderEmptyExam("Bank Soal belum memiliki soal untuk konfigurasi ini."); }
-            } catch(e) { showModal("Gagal", "Gagal memuat ujian.", "<i class='fas fa-times text-red-500'></i>"); } finally { hideLoading(); }
+                // Filter pencarian disesuaikan dengan nama kolom Supabase (subject, topic, dst)
+                const { data, error } = await client
+                    .from('questions')
+                    .select('*')
+                    .eq('subject', state.mapel)
+                    .eq('topic', state.topik)
+                    .eq('subtopic', state.subtopik)
+                    .eq('difficulty_level', state.lvl)
+                    .limit(state.qty);
+
+                if (error) throw error;
+
+                if (data && data.length > 0) { 
+                    // Acak urutan soal yang didapat
+                    activeQuestions = data.sort(() => 0.5 - Math.random()); 
+                    
+                    $('exam-title-text').innerText = `Latihan: ${state.subtopik}`; 
+                    userAnswers = {}; 
+                    startExamEngine(); 
+                } else { 
+                    renderEmptyExam("Bank Soal belum memiliki soal untuk konfigurasi ini."); 
+                }
+            } catch(e) { 
+                console.error(e);
+                showModal("Gagal", "Gagal memuat ujian.", "<i class='fas fa-times text-red-500'></i>"); 
+            } finally { 
+                hideLoading(); 
+            }
         }
 
         async function executeQuizByKode(kode_set, judulKuis) {
